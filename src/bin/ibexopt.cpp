@@ -253,20 +253,20 @@ int main(int argc, char** argv) {
 			cout << "  Generates COV with:\tvariable domains only\n";
 			config.set_extended_cov(false);
 		}
-
+		/*
 		if (!quiet) {
 			cout << "*******************************************************" << endl << endl;
 		}
-
+		*/
 		// Build the default optimizer
 		Optimizer o(config);
 
 		// display solutions with up to 12 decimals
 		cout.precision(12);
-
+		/*
 		if (!quiet)
 			cout << "running............" << endl << endl;
-
+		*/
 		// Search for the optimum
 		// Get the solutions
 		if (input_file)
@@ -288,12 +288,14 @@ int main(int argc, char** argv) {
 			o.report();
 
 		o.get_data().save(output_cov_file.c_str());
-
+		
+		/*
 		if (!quiet) {
 			cout << " results written in " << output_cov_file << "\n";
 			if (overwitten)
 				cout << " (old file saved in " << cov_copy << ")\n";
 		}
+		*/
 
 		delete sys;
 
