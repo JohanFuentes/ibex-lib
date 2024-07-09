@@ -11,7 +11,7 @@
 #ifndef __IBEX_CELL_BEAM_SEARCH_H__
 #define __IBEX_CELL_BEAM_SEARCH_H__
 
-#include "ibex_CellHeap.h"
+#include "ibex_CellDoubleHeap.h"
 #include "ibex_CellCostFunc.h"
 #include "ibex_CellBufferOptim.h"
 #include "ibex_ExtendedSystem.h"
@@ -34,13 +34,13 @@ namespace ibex {
  *  "Node selection strategies in interval Branch and Bound algorithms"  article by B. Neveu, G. Trombettoni and I. Araya)
  * 
  */
-class CellBeamSearch: public CellHeap {
+class CellBeamSearch: public CellDoubleHeap {
 public :
 
 	/**
 	 * \brief Create the global buffer from two heaps.
 	 */
-	CellBeamSearch (CellHeap& currentbuffer, CellHeap& futurebuffer, const ExtendedSystem & sys, unsigned int beamsize =default_beamsize) ;
+	CellBeamSearch (CellDoubleHeap& currentbuffer, CellDoubleHeap& futurebuffer, const ExtendedSystem & sys, unsigned int beamsize =default_beamsize) ;
 
 	/**
 	 * \brief Delete this.
@@ -80,13 +80,16 @@ public :
 	/** \brief The default value for the maximum beam size */
 	static constexpr unsigned int default_beamsize = 1;
 
-protected :
+//protected : //Linea comentado para poder acceder a los metodos
 	/**
 	 * \brief Return the cost of a cell
 	 *
 	 * LB criterion.
 	 */
+	 /*
 	double cell_cost (const Cell& cell) const;
+	//double cell_cost2 (const Cell& cell) const;
+	*/
 
 	/** \brief The maximum size of "currentbuffer " (the beam) */
 	unsigned  int   beamsize;
@@ -95,14 +98,13 @@ protected :
 	void move_buffers();
 
 	/** \brief The current buffer, actual beam of limited size */
-	CellHeap&  currentbuffer;
+	CellDoubleHeap&  currentbuffer;
 
 	/** \brief The nodes sons of a node from the current buffer */
-	CellHeap&  futurebuffer;
+	CellDoubleHeap&  futurebuffer;
 
 };
 
 } // namespace ibex
 
 #endif // __IBEX_CELL_BEAM_SEARCH_H__
-
