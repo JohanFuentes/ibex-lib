@@ -14,7 +14,7 @@ using namespace std;
 
 namespace ibex {
 
-CellBeamSearch::CellBeamSearch(CellHeap& currentbuffer, CellHeap& futurebuffer, const ExtendedSystem & sys, unsigned int beamsize) : CellHeap (sys), beamsize(beamsize), currentbuffer(currentbuffer), futurebuffer (futurebuffer) {
+CellBeamSearch::CellBeamSearch(CellDoubleHeap& currentbuffer, CellDoubleHeap& futurebuffer, const ExtendedSystem & sys, unsigned int beamsize) : CellDoubleHeap (sys), beamsize(beamsize), currentbuffer(currentbuffer), futurebuffer (futurebuffer) {
 
 }
 
@@ -23,22 +23,22 @@ CellBeamSearch::~CellBeamSearch() {
 }
 
 bool CellBeamSearch::empty() const {
-	return (currentbuffer.empty()  && futurebuffer.empty() && CellHeap::empty());
+	return (currentbuffer.empty()  && futurebuffer.empty() && CellDoubleHeap::empty());
 }
 
 unsigned int  CellBeamSearch::size() const {
-	return (currentbuffer.size()+ futurebuffer.size() + CellHeap::size());
+	return (currentbuffer.size()+ futurebuffer.size() + CellDoubleHeap::size());
 }
 
 void CellBeamSearch::flush() {
 	currentbuffer.flush();
 	futurebuffer.flush();
-	CellHeap::flush();
+	CellDoubleHeap::flush();
 }
 
 void CellBeamSearch::contract(double new_loup) {
 
-	if (!(CellHeap::empty()))	Heap<Cell>::contract(new_loup);
+	if (!(CellDoubleHeap::empty()))	DoubleHeap<Cell>::contract(new_loup);
 
 	if (!(currentbuffer.empty()))
 		currentbuffer.contract(new_loup);
@@ -53,9 +53,12 @@ void CellBeamSearch::push(Cell* cell) {
 	futurebuffer.push(cell);
 }
 
+/*
 double CellBeamSearch::cell_cost(const Cell& cell) const {
-	return cell.box[sys.goal_var()].lb();
+	return cell.box[sys.goal_var()].lb(); // lb linea original 
+	//return cell.box[sys.goal_var()].ub(); // ub
 }
+*/
 
 // returns the cell to handled
 Cell* CellBeamSearch::pop() {
@@ -66,7 +69,7 @@ Cell* CellBeamSearch::pop() {
 		move_buffers();
 		return c;
 	}
-	else return CellHeap::pop();
+	else return CellDoubleHeap::pop();
 }
 
 // emptying the futurebuffer : buffersize-1 cells are put into
@@ -76,7 +79,7 @@ void CellBeamSearch::move_buffers() {
 		if (currentbuffer.size() < beamsize-1)
 			currentbuffer.push(futurebuffer.pop());
 		else
-			CellHeap::push(futurebuffer.pop());
+			CellDoubleHeap::push(futurebuffer.pop());
 	}
 }
 
@@ -89,21 +92,21 @@ Cell* CellBeamSearch::top() const {
 			return futurebuffer.top();
 		}
 		else {
-			return CellHeap::top();
+			return CellDoubleHeap::top();
 		}
 }
 
 // the minimum of all open nodes
 double CellBeamSearch::minimum() const {
 	assert (!(empty()));
-	if  (! (currentbuffer.empty()) && !(futurebuffer.empty()) &&  (!CellHeap::empty())){
+	if  (! (currentbuffer.empty()) && !(futurebuffer.empty()) &&  (!CellDoubleHeap::empty())){
 		//      cout << "minimum " << currentbuffer.minimum() << "  " << futurebuffer.minimum() <<  " " << CellHeap::minimum() << endl;
-		return std::min (currentbuffer.minimum(), std::min( futurebuffer.minimum(),  CellHeap::minimum()));
+		return std::min (currentbuffer.minimum(), std::min( futurebuffer.minimum(),  CellDoubleHeap::minimum()));
 	}
-	else if (! (currentbuffer.empty()) && !CellHeap::empty())
-		return std::min(currentbuffer.minimum(), CellHeap::minimum());
-	else if (! (futurebuffer.empty()) && !CellHeap::empty())
-		return std::min(futurebuffer.minimum(), CellHeap::minimum());
+	else if (! (currentbuffer.empty()) && !CellDoubleHeap::empty())
+		return std::min(currentbuffer.minimum(), CellDoubleHeap::minimum());
+	else if (! (futurebuffer.empty()) && !CellDoubleHeap::empty())
+		return std::min(futurebuffer.minimum(), CellDoubleHeap::minimum());
 	else if  (! (futurebuffer.empty()) && !currentbuffer.empty())
 		return std::min(futurebuffer.minimum(), currentbuffer.minimum());
 	else if  (! (futurebuffer.empty()))
@@ -111,7 +114,7 @@ double CellBeamSearch::minimum() const {
 	else if  (!(currentbuffer.empty()))
 		return currentbuffer.minimum();
 	else
-		return CellHeap::minimum();
+		return CellDoubleHeap::minimum();
 }
 
 } // end namespace
