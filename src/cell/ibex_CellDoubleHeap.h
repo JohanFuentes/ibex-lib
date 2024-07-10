@@ -49,8 +49,8 @@ public:
 	 * \param crit   - second criterion in node selection (the first criterion is the
 	 *                 minimum of the objective estimate). default value CellHeapOPtim::UB.
 	 */
-	CellDoubleHeap(const ExtendedSystem& sys, int crit2_pr=50,
-			CellCostFunc::criterion crit2=CellCostFunc::UB);
+	CellDoubleHeap(const ExtendedSystem& sys, int crit2_pr=100,
+			CellCostFunc::criterion crit2=CellCostFunc::PF_UB);
 
     /**
 	 * \brief Delete *this.
