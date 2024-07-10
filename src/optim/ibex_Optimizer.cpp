@@ -567,6 +567,7 @@ const char* white() {
 
 void Optimizer::report() {
 
+/*
 	if (!cov || !buffer.empty()) { // not started
 		cout << " not started." << endl;
 		return;
@@ -634,6 +635,9 @@ void Optimizer::report() {
 	if (cov->nb_cells()!=nb_cells)
 		cout << " [total=" << cov->nb_cells() << "]";
 	cout << endl << endl;
+
+*/
+	cout <<nb_cells<<" "<<time<<endl;
 }
 
 
