@@ -204,8 +204,10 @@ CellBufferOptim& DefaultOptimizerConfig::get_cell_buffer() {
 
 //			  (CellBufferOptim&) rec(new CellDoubleHeap(get_ext_sys()))
 	return (CellBufferOptim&) rec (new  CellBeamSearch (
-			(CellHeap&) rec (new CellHeap (ext_sys)),
-			(CellHeap&) rec (new CellHeap (ext_sys)),
+			//(CellHeap&) rec (new CellHeap (ext_sys)),
+			//(CellHeap&) rec (new CellHeap (ext_sys)),
+			(CellDoubleHeap&) rec (new CellDoubleHeap (ext_sys)),
+			(CellDoubleHeap&) rec (new CellDoubleHeap (ext_sys)),	
 			ext_sys), CELL_BUFFER_TAG);
 }
 
