@@ -252,8 +252,10 @@ LoupFinder& Optimizer04Config::get_loup_finder() {
 CellBufferOptim& Optimizer04Config::get_cell_buffer() {
 	CellBufferOptim* buffer;
 
-	CellHeap* futurebuffer = &rec(new CellHeap(*ext_sys));
-	CellHeap* currentbuffer = &rec(new CellHeap(*ext_sys));
+	//CellHeap* futurebuffer = &rec(new CellHeap(*ext_sys));
+	//CellHeap* currentbuffer = &rec(new CellHeap(*ext_sys));
+	CellDoubleHeap* futurebuffer = &rec(new CellDoubleHeap(*ext_sys));
+	CellDoubleHeap* currentbuffer = &rec(new CellDoubleHeap(*ext_sys));
 
 	//cout << "strategy=[" << strategy << "]\n";
 	if (strategy=="bfs")
