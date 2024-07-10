@@ -34,7 +34,7 @@ public:
 	 *                                    > 0 = only the first heap
 	 *                                    > 100 = only the second heap.
 	 */
-	DoubleHeap(CostFunc<T>& cost1, bool update_cost1_when_sorting, CostFunc<T>& cost2, bool update_cost2_when_sorting, int critpr=50);
+	DoubleHeap(CostFunc<T>& cost1, bool update_cost1_when_sorting, CostFunc<T>& cost2, bool update_cost2_when_sorting, int critpr=100);
 
 	/**
  		 * \brief Copy constructor.
