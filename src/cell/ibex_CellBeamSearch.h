@@ -77,6 +77,11 @@ public :
 	/** \brief Remove the cells with a LB greater than new_loup */
 	virtual void contract (double new_loup);
 
+	/** \brief Change cost function 2 value. */
+    virtual void setCost2Function(const CellCostFunc& newCostFunc);
+	
+    //virtual void setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting);
+
 	/** \brief The default value for the maximum beam size */
 	static constexpr unsigned int default_beamsize = 1;
 

@@ -41,4 +41,7 @@ Cell* CellList::top() const {
 	return clist.front();
 }
 
+void CellList::setCost2Function(const CellCostFunc& newCostFunc) {
+}
+
 } // end namespace ibex

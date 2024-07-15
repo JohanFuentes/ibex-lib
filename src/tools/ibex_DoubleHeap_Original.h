@@ -82,11 +82,6 @@ public:
 	/** \brief Return next data of the second heap  (but does not pop it).*/
 	T* top2() const;
 
-	/** \brief Return next data of the second heap  (but does not pop it).*/
-    void setCost2Function(const CostFunc<T>& newCostFunc);
-
-    //void setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting);
-
 	/**
 	 * \brief Return the minimum (the criterion for the first heap)
 	 *
@@ -388,22 +383,6 @@ T* DoubleHeap<T>::top2() const {
 	return heap2->top();
 
 }
-
-template<class T>
-void DoubleHeap<T>::setCost2Function(const CostFunc<T>& newCostFunc) {
-    if (heap2) {
-        heap2->setCostFunction(newCostFunc);
-    }
-}
-
-/*
-template<class T>
-void DoubleHeap<T>::setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting) {
-    if (heap2) {
-        heap2->setUpdateCostWhenSorting(newUpdateCostWhenSorting);
-    }
-}
-*/
 
 template<class T>
 inline double DoubleHeap<T>::minimum() const {	return heap1->minimum(); }

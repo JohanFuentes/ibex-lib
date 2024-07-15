@@ -42,4 +42,7 @@ Cell* CellStack::top() const {
 	return cstack.top();
 }
 
+void CellStack::setCost2Function(const CellCostFunc& newCostFunc) {
+}
+
 } // end namespace ibex

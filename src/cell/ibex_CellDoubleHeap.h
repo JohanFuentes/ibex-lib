@@ -85,6 +85,13 @@ public:
 	Cell* top() const;
 
 
+	/** \brief Change cost function 2 value. */
+    void setCost2Function(const CellCostFunc& newCostFunc);
+
+	
+    //void setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting);
+
+
 	std::ostream& print(std::ostream& os) const;
 
 	/**
@@ -174,6 +181,24 @@ inline void CellDoubleHeap::push(Cell* cell) {
 
 inline Cell* CellDoubleHeap::pop()                { return DoubleHeap<Cell>::pop(); }
 inline Cell* CellDoubleHeap::top() const          { return DoubleHeap<Cell>::top(); }
+
+
+
+
+
+inline void CellDoubleHeap::setCost2Function(const CellCostFunc& newCostFunc) {
+    if (heap2) {
+        DoubleHeap<Cell>::setCost2Function(newCostFunc);
+    }
+}
+
+/*
+inline void CellDoubleHeap::setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting) {
+    if (heap2) {
+		DoubleHeap<Cell>::setUpdateCost2WhenSorting(newUpdateCostWhenSorting);
+    }
+}
+*/
 
 inline double CellDoubleHeap::minimum() const     { return DoubleHeap<Cell>::minimum(); }
 

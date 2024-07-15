@@ -567,7 +567,8 @@ const char* white() {
 
 void Optimizer::report() {
 
-/*
+//DESDE ACA
+
 	if (!cov || !buffer.empty()) { // not started
 		cout << " not started." << endl;
 		return;
@@ -636,7 +637,7 @@ void Optimizer::report() {
 		cout << " [total=" << cov->nb_cells() << "]";
 	cout << endl << endl;
 
-*/
+// HASTA ACA
 	cout <<nb_cells<<" "<<time<<endl;
 }
 

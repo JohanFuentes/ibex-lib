@@ -90,23 +90,6 @@ public:
 	T* top() const;
 
 	/**
-	 * \brief Change Cost Function.
-	 *
-	 *
-	 */
-    void setCostFunction(const CostFunc<T>& newCostFunc);
-
-	/**
-	 * \brief Value Update Cost When Sorting.
-	 *
-	 *
-	 */
-    // Método para cambiar si se actualiza el costo al ordenar
-    void setUpdateCostWhenSorting(bool newUpdateCostWhenSorting);
-
-
-
-	/**
 	 * \brief Return the minimum (the criterion for
 	 *        the first element)
 	 */
@@ -414,17 +397,6 @@ bool SharedHeap<T>::empty() const {
 template<class T>
 T* SharedHeap<T>::top() const {
 	return root->elt->data;
-}
-
-template<class T>
-void SharedHeap<T>::setCostFunction(const CostFunc<T>& newCostFunc) {
-    costf = newCostFunc;
-	sort();
-}
-
-template<class T>
-void SharedHeap<T>::setUpdateCostWhenSorting(bool newUpdateCostWhenSorting) {
-    update_cost_when_sorting = newUpdateCostWhenSorting;
 }
 
 

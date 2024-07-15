@@ -36,16 +36,6 @@ Cell* CellHeap::pop()                    { return Heap<Cell>::pop(); }
 
 Cell* CellHeap::top() const              { return Heap<Cell>::top(); }
 
-void CellHeap::setCost2Function(const CellCostFunc& newCostFunc) {
-    Heap<Cell>::setCost2Function(newCostFunc);
-}
-
-/*
-void CellHeap::setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting) {
-	Heap<Cell>::setUpdateCost2WhenSorting(newUpdateCostWhenSorting);
-}
-*/
-
 double CellHeap::minimum() const         { return Heap<Cell>::minimum(); }
 
 void CellHeap::contract(double new_loup) { Heap<Cell>::contract(new_loup); }

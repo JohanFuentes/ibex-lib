@@ -49,6 +49,32 @@ void CellBeamSearch::contract(double new_loup) {
 	}
 }
 
+void CellBeamSearch::setCost2Function(const CellCostFunc& newCostFunc) {
+
+	if (!(CellDoubleHeap::empty()))	DoubleHeap<Cell>::setCost2Function(newCostFunc);
+	if (!(currentbuffer.empty())){
+		currentbuffer.setCost2Function(newCostFunc);
+	}
+
+	if (!(futurebuffer.empty())) {
+		futurebuffer.setCost2Function(newCostFunc);
+
+	}
+}
+/*
+void CellBeamSearch::setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting) {
+
+	if (!(CellDoubleHeap::empty()))	DoubleHeap<Cell>::setUpdateCost2WhenSorting(newUpdateCostWhenSorting);
+	if (!(currentbuffer.empty())){
+		currentbuffer.setUpdateCost2WhenSorting(newUpdateCostWhenSorting);
+	}
+	if (!(futurebuffer.empty())) {
+		futurebuffer.setUpdateCost2WhenSorting(newUpdateCostWhenSorting);
+
+	}
+}
+*/
+
 void CellBeamSearch::push(Cell* cell) {
 	futurebuffer.push(cell);
 }
