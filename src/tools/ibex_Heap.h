@@ -90,12 +90,6 @@ public:
 	/** Return the next box (but does not pop it).*/
 	T* top() const;
 
-	/** \brief Return next data of the second heap  (but does not pop it).*/
-    void setCost2Function(const CostFunc<T>& newCostFunc);
-
-
-    //void setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting);
-
 	/**
 	 * \brief Contracts the heap.
 	 *
@@ -222,18 +216,6 @@ template<class T>
 T* Heap<T>::top() const {
 	return l.front().first;
 }
-
-template<class T>
-void Heap<T>::setCost2Function(const CostFunc<T>& newCostFunc) {
-	costf = newCostFunc;
-}
-
-/*
-template<class T>
-void Heap<T>::setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting) {
-
-}
-*/
 
 template<class T>
 double Heap<T>::minimum() const {

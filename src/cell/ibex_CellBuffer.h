@@ -12,7 +12,6 @@
 #define __IBEX_CELL_BUFFER_H__
 
 #include "ibex_Cell.h"
-#include "ibex_CellCostFunc.h"
 
 namespace ibex {
 
@@ -83,11 +82,6 @@ class CellBuffer {
 
 	/** Return the next box (but does not pop it).*/
 	virtual Cell* top() const=0;
-
-	/** \brief Change cost function 2 value. */
-    virtual void setCost2Function(const CellCostFunc& newCostFunc)=0;
-
-    //virtual void setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting)=0;
 
 	/** Count the number of cells pushed since
 	 * the object is created. */

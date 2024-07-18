@@ -63,11 +63,6 @@ public:
 	/** \brief Return the top cell (but does not pop it).*/
 	virtual Cell* top() const;
 
-	/** \brief Change cost function 2 value. */
-    void setCost2Function(const CellCostFunc& newCostFunc);
-
-    //void setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting);
-
 	virtual std::ostream& print(std::ostream& os) const;
 
 	/**

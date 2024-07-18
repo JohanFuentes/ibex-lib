@@ -49,8 +49,11 @@ public:
 	 * \param crit   - second criterion in node selection (the first criterion is the
 	 *                 minimum of the objective estimate). default value CellHeapOPtim::UB.
 	 */
-	CellDoubleHeap(const ExtendedSystem& sys, int crit2_pr=100,
-			CellCostFunc::criterion crit2=CellCostFunc::PF_UB);
+	CellDoubleHeap(const ExtendedSystem& sys, int crit2_pr=100, CellCostFunc::criterion crit2=CellCostFunc::UB,
+			CellCostFunc::criterion crit3=CellCostFunc::C3, CellCostFunc::criterion crit4=CellCostFunc::C5,
+			CellCostFunc::criterion crit5=CellCostFunc::C7, CellCostFunc::criterion crit6=CellCostFunc::PU,
+			CellCostFunc::criterion crit7=CellCostFunc::PF_LB, CellCostFunc::criterion crit8=CellCostFunc::PF_UB
+			);
 
     /**
 	 * \brief Delete *this.
@@ -83,14 +86,6 @@ public:
 
 	/** \brief Return the next box (but does not pop it).*/
 	Cell* top() const;
-
-
-	/** \brief Change cost function 2 value. */
-    void setCost2Function(const CellCostFunc& newCostFunc);
-
-	
-    //void setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting);
-
 
 	std::ostream& print(std::ostream& os) const;
 
@@ -129,9 +124,14 @@ protected:
 
 /*================================== inline implementations ========================================*/
 
-inline CellDoubleHeap::CellDoubleHeap(const ExtendedSystem& sys, int crit2_pr, CellCostFunc::criterion crit2) :
+inline CellDoubleHeap::CellDoubleHeap(const ExtendedSystem& sys, int crit2_pr,
+CellCostFunc::criterion crit2, CellCostFunc::criterion crit3, CellCostFunc::criterion crit4, CellCostFunc::criterion crit5,
+CellCostFunc::criterion crit6, CellCostFunc::criterion crit7, CellCostFunc::criterion crit8) :
 		DoubleHeap<Cell>(*new CellCostVarLB(sys, sys.goal_var()), false,
-				*CellCostFunc::get_cost(sys, crit2, sys.goal_var()), true /* TODO: give right value */, crit2_pr),
+				*CellCostFunc::get_cost(sys, crit2, sys.goal_var()),*CellCostFunc::get_cost(sys, crit3, sys.goal_var()) ,
+				*CellCostFunc::get_cost(sys, crit4, sys.goal_var()), *CellCostFunc::get_cost(sys, crit5, sys.goal_var()),
+				*CellCostFunc::get_cost(sys, crit6, sys.goal_var()), *CellCostFunc::get_cost(sys, crit7, sys.goal_var()),
+				*CellCostFunc::get_cost(sys, crit8, sys.goal_var()), true /* TODO: give right value */, crit2_pr),
 		sys(sys) {
 }
 
@@ -150,18 +150,66 @@ inline void CellDoubleHeap::contract(double new_loup) {
 		heap1->sort();
 	}
 
-	cost2().set_loup(new_loup);
+	((CellCostFunc&)heap2->costf2).set_loup(new_loup);
+	((CellCostFunc&)heap2->costf3).set_loup(new_loup);
+	((CellCostFunc&)heap2->costf4).set_loup(new_loup);
+	((CellCostFunc&)heap2->costf5).set_loup(new_loup);
+	((CellCostFunc&)heap2->costf6).set_loup(new_loup);
+	((CellCostFunc&)heap2->costf7).set_loup(new_loup);
+	((CellCostFunc&)heap2->costf8).set_loup(new_loup);
+	//cost2().set_loup(new_loup);
 	DoubleHeap<Cell>::contract(new_loup);
 }
 
-inline CellCostFunc& CellDoubleHeap::cost1()      { return (CellCostFunc&) heap1->costf; }
+inline CellCostFunc& CellDoubleHeap::cost1(){ 
+	return (CellCostFunc&) heap1->costf1;
+}
 
-inline CellCostFunc& CellDoubleHeap::cost2()      { return (CellCostFunc&) heap2->costf; }
+inline CellCostFunc& CellDoubleHeap::cost2(){ 
+    
+	switch (heap2->getIndexFunction()) {
+		case 0:
+			return (CellCostFunc&) heap2->costf1;
+			break;
+        case 1:
+            return (CellCostFunc&) heap2->costf2;
+            break;
+        case 2:
+            return (CellCostFunc&) heap2->costf3;
+            break;
+        case 3:
+            return (CellCostFunc&) heap2->costf4;
+            break;
+		case 4:
+			return (CellCostFunc&) heap2->costf5;
+			break;
+		case 5:
+			return (CellCostFunc&) heap2->costf6;
+			break;
+		case 6:
+			return (CellCostFunc&) heap2->costf7;
+			break;
+		case 7:
+			return (CellCostFunc&) heap2->costf8;
+			break;
+        default:
+            std::cout << "No Valid Index" << std::endl;
+            break;	
+	}	
+}
 
 inline void CellDoubleHeap::add_property(const IntervalVector& init_box, BoxProperties& map) {
       // add data "pu" and "pf" (if required)
-       cost2().add_property(map);
+       //cost2().add_property(map);
+	   ((CellCostFunc&)heap2->costf2).add_property(map);
+	   ((CellCostFunc&)heap2->costf3).add_property(map);
+	   ((CellCostFunc&)heap2->costf4).add_property(map);
+	   ((CellCostFunc&)heap2->costf5).add_property(map);
+	   ((CellCostFunc&)heap2->costf6).add_property(map);
+	   ((CellCostFunc&)heap2->costf7).add_property(map);
+	   ((CellCostFunc&)heap2->costf8).add_property(map);
 }
+
 
 inline void CellDoubleHeap::flush()               { DoubleHeap<Cell>::flush(); }
 
@@ -171,8 +219,14 @@ inline bool CellDoubleHeap::empty() const         { return DoubleHeap<Cell>::emp
 
 inline void CellDoubleHeap::push(Cell* cell) {
        // we know cost1() does not require OptimData
-       cost2().set_optim_data(*cell);
-
+       //cost2().set_optim_data(*cell);
+	   ((CellCostFunc&)heap2->costf2).set_optim_data(*cell);
+	   ((CellCostFunc&)heap2->costf3).set_optim_data(*cell);
+	   ((CellCostFunc&)heap2->costf4).set_optim_data(*cell);
+	   ((CellCostFunc&)heap2->costf5).set_optim_data(*cell);
+	   ((CellCostFunc&)heap2->costf6).set_optim_data(*cell);
+	   ((CellCostFunc&)heap2->costf7).set_optim_data(*cell);
+	   ((CellCostFunc&)heap2->costf8).set_optim_data(*cell);
        // the cell is put into the 2 heaps
        DoubleHeap<Cell>::push(cell);
 
@@ -181,24 +235,6 @@ inline void CellDoubleHeap::push(Cell* cell) {
 
 inline Cell* CellDoubleHeap::pop()                { return DoubleHeap<Cell>::pop(); }
 inline Cell* CellDoubleHeap::top() const          { return DoubleHeap<Cell>::top(); }
-
-
-
-
-
-inline void CellDoubleHeap::setCost2Function(const CellCostFunc& newCostFunc) {
-    if (heap2) {
-        DoubleHeap<Cell>::setCost2Function(newCostFunc);
-    }
-}
-
-/*
-inline void CellDoubleHeap::setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting) {
-    if (heap2) {
-		DoubleHeap<Cell>::setUpdateCost2WhenSorting(newUpdateCostWhenSorting);
-    }
-}
-*/
 
 inline double CellDoubleHeap::minimum() const     { return DoubleHeap<Cell>::minimum(); }
 

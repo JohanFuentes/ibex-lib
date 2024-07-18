@@ -78,23 +78,19 @@ public :
 	virtual void contract (double new_loup);
 
 	/** \brief Change cost function 2 value. */
-    virtual void setCost2Function(const CellCostFunc& newCostFunc);
-	
-    //virtual void setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting);
+    virtual void setCost2Function(int index);
 
 	/** \brief The default value for the maximum beam size */
 	static constexpr unsigned int default_beamsize = 1;
 
-//protected : //Linea comentado para poder acceder a los metodos
+protected : //Linea comentado para poder acceder a los metodos
 	/**
 	 * \brief Return the cost of a cell
 	 *
 	 * LB criterion.
 	 */
-	 /*
+	 
 	double cell_cost (const Cell& cell) const;
-	//double cell_cost2 (const Cell& cell) const;
-	*/
 
 	/** \brief The maximum size of "currentbuffer " (the beam) */
 	unsigned  int   beamsize;

@@ -43,8 +43,6 @@ class CellStack : public CellBuffer {
   /** Return the next box (but does not pop it).*/
   Cell* top() const;
 
-  void setCost2Function(const CellCostFunc& newCostFunc);
-
  private:
   /* Stack of cells */
   std::stack<Cell*> cstack;

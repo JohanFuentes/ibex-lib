@@ -13,10 +13,11 @@
 #include "ibex_NoBisectableVariableException.h"
 #include "ibex_BxpOptimData.h"
 #include "ibex_CovOptimData.h"
-
+#include <typeinfo>
 #include <float.h>
 #include <stdlib.h>
 #include <iomanip>
+#include "ibex_CellBeamSearch.h"
 
 using namespace std;
 
@@ -415,13 +416,35 @@ void Optimizer::start(const CovOptimData& data, double obj_init_bound) {
 Optimizer::Status Optimizer::optimize() {
 	Timer timer;
 	timer.start();
+	int option = 0;
 
 	update_uplo();
 
 	try {
-	     while (!buffer.empty()) {
+		//Cast to CellBeamSearch for use of setCost2Function
+		CellBeamSearch * thebuffer = dynamic_cast<CellBeamSearch*>(&buffer);
+	    
+		while (!buffer.empty()) {
 
 			loup_changed=false;
+
+			//Set the cost function for the buffer
+			/*
+				0:LB
+				1:UB
+				2:C3
+				3:C5
+				4:C7
+				5:PU
+				6:PF_LB
+				7:PF_UB
+			*/
+
+			thebuffer->setCost2Function(option);
+			option++;
+
+			if (option == 8){option = 0;}
+
 			// for double heap , choose randomly the buffer : top  has to be called before pop
 			Cell *c = buffer.top();
 			if (trace >= 2) cout << " current box " << c->box << endl;
@@ -567,8 +590,6 @@ const char* white() {
 
 void Optimizer::report() {
 
-//DESDE ACA
-
 	if (!cov || !buffer.empty()) { // not started
 		cout << " not started." << endl;
 		return;
@@ -637,8 +658,8 @@ void Optimizer::report() {
 		cout << " [total=" << cov->nb_cells() << "]";
 	cout << endl << endl;
 
-// HASTA ACA
-	cout <<nb_cells<<" "<<time<<endl;
+	//For use automatic tests
+	//cout <<nb_cells<<" "<<time<<endl;
 }
 
 

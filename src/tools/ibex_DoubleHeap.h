@@ -25,16 +25,23 @@ public:
 	/**
 	 * \brief Create a double heap
 	 *
-	 * \param cost1                     - cost function for the first heap
+	 * \param cost1                     - cost function for heap 1 y 2
 	 * \param update_cost1_when_sorting - whether this cost is recalculated when sorting
-	 * \param cost2                     - cost function for the second heap
+	 * \param cost2                     - cost function for heap 1 y 2
+	 * \param cost3                     - cost function for heap 1 y 2
+	 * \param cost4                     - cost function for heap 1 y 2
+	 * \param cost5                     - cost function for heap 1 y 2
+	 * \param cost6                     - cost function for heap 1 y 2
+	 * \param cost7                     - cost function for heap 1 y 2
+	 * \param cost8                     - cost function for heap 1 y 2
 	 * \param update_cost2_when_sorting - whether this cost is recalculated when sorting
 	 * \param critpr                    - probability to chose the second heap as an integer in [0,100] (default value 50).
 	 *                                    Value 0 or correspond to use a single criterion for node selection
 	 *                                    > 0 = only the first heap
 	 *                                    > 100 = only the second heap.
 	 */
-	DoubleHeap(CostFunc<T>& cost1, bool update_cost1_when_sorting, CostFunc<T>& cost2, bool update_cost2_when_sorting, int critpr=100);
+	DoubleHeap(CostFunc<T>& cost1, bool update_cost1_when_sorting, CostFunc<T>& cost2, CostFunc<T>& cost3, CostFunc<T>& cost4,
+	CostFunc<T>& cost5, CostFunc<T>& cost6, CostFunc<T>& cost7, CostFunc<T>& cost8, bool update_cost2_when_sorting, int critpr=100);
 
 	/**
  		 * \brief Copy constructor.
@@ -82,10 +89,8 @@ public:
 	/** \brief Return next data of the second heap  (but does not pop it).*/
 	T* top2() const;
 
-	/** \brief Return next data of the second heap  (but does not pop it).*/
-    void setCost2Function(const CostFunc<T>& newCostFunc);
-
-    //void setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting);
+    /** \brief Return the second heap.*/
+	SharedHeap<T>& getHeap2();
 
 	/**
 	 * \brief Return the minimum (the criterion for the first heap)
@@ -178,9 +183,10 @@ private:
 /*================================== inline implementations ========================================*/
 
 template<class T>
-DoubleHeap<T>::DoubleHeap(CostFunc<T>& cost1, bool update_cost1_when_sorting, CostFunc<T>& cost2, bool update_cost2_when_sorting, int critpr) :
-		 nb_nodes(0), heap1(new SharedHeap<T>(cost1,update_cost1_when_sorting,0)),
-		              heap2(new SharedHeap<T>(cost2,update_cost2_when_sorting,1)),
+DoubleHeap<T>::DoubleHeap(CostFunc<T>& cost1, bool update_cost1_when_sorting, CostFunc<T>& cost2, CostFunc<T>& cost3,
+CostFunc<T>& cost4, CostFunc<T>& cost5, CostFunc<T>& cost6, CostFunc<T>& cost7, CostFunc<T>& cost8, bool update_cost2_when_sorting, int critpr) :
+		 nb_nodes(0), heap1(new SharedHeap<T>(cost1,cost2,cost3,cost4,cost5,cost6,cost7,cost8,update_cost1_when_sorting,0)),
+		              heap2(new SharedHeap<T>(cost1,cost2,cost3,cost4,cost5,cost6,cost7,cost8,update_cost2_when_sorting,1)),
 		              critpr(critpr), current_heap_id(0) {
 
 }
@@ -190,7 +196,8 @@ DoubleHeap<T>::DoubleHeap(const DoubleHeap &dhcp, bool deep_copy) :
 nb_nodes(dhcp.nb_nodes), heap1(NULL), heap2(NULL), critpr(dhcp.critpr), current_heap_id(dhcp.current_heap_id) {
 	heap1 = new SharedHeap<T>(*dhcp.heap1, 2, deep_copy);
 	std::vector<HeapElt<T>*> p = heap1->elt();
-	heap2 = new SharedHeap<T>(dhcp.heap2->costf, dhcp.heap2->update_cost_when_sorting, dhcp.heap2->heap_id);
+	heap2 = new SharedHeap<T>(dhcp.heap2->costf1,dhcp.heap2->costf2,dhcp.heap2->costf3,dhcp.heap2->costf4,dhcp.heap2->costf5,
+	dhcp.heap2->costf6,dhcp.heap2->costf7,dhcp.heap2->costf8, dhcp.heap2->update_cost_when_sorting, dhcp.heap2->heap_id);
 
 	while(!p.empty()) {
 		heap2->push_elt(p.back());
@@ -231,11 +238,15 @@ unsigned int DoubleHeap<T>::size() const {
 }
 
 template<class T>
+SharedHeap<T>& DoubleHeap<T>::getHeap2() { return *heap2; }
+
+template<class T>
 void DoubleHeap<T>::contract(double new_loup1) {
 
 	if (nb_nodes==0) return;
 
-	SharedHeap<T>* copy1 = new SharedHeap<T>(heap1->costf, heap1->update_cost_when_sorting, 0);
+	SharedHeap<T>* copy1 = new SharedHeap<T>(heap1->costf1, heap1->costf2, heap1->costf3, heap1->costf4, heap1->costf5 ,
+	heap1->costf6, heap1->costf7, heap1->costf8, heap1->update_cost_when_sorting, 0);
 
 	contract_rec(new_loup1, heap1->root, *copy1, !heap2->update_cost_when_sorting);
 
@@ -253,7 +264,6 @@ void DoubleHeap<T>::contract(double new_loup1) {
 	assert(heap1->heap_state());
 	assert(!heap2 || heap2->heap_state());
 }
-
 
 template<class T>
 void DoubleHeap<T>::contract_rec(double new_loup1, HeapNode<T>* node, SharedHeap<T>& heap, bool percolate) {
@@ -336,13 +346,16 @@ T* DoubleHeap<T>::pop() {
 	assert(!heap2 || heap2->heap_state());
 
 	// select the heap
+
+	current_heap_id=1;
+	/*
 	if (RNG::rand() % 100 >= static_cast<unsigned>(critpr)) {
 		current_heap_id=0;
 	}
 	else {
 		current_heap_id=1;
 	}
-
+	*/
 	return data;
 }
 
@@ -390,22 +403,6 @@ T* DoubleHeap<T>::top2() const {
 }
 
 template<class T>
-void DoubleHeap<T>::setCost2Function(const CostFunc<T>& newCostFunc) {
-    if (heap2) {
-        heap2->setCostFunction(newCostFunc);
-    }
-}
-
-/*
-template<class T>
-void DoubleHeap<T>::setUpdateCost2WhenSorting(bool newUpdateCostWhenSorting) {
-    if (heap2) {
-        heap2->setUpdateCostWhenSorting(newUpdateCostWhenSorting);
-    }
-}
-*/
-
-template<class T>
 inline double DoubleHeap<T>::minimum() const {	return heap1->minimum(); }
 
 template<class T>
@@ -429,14 +426,12 @@ std::ostream& DoubleHeap<T>::print(std::ostream& os) const{
 	}
 	return os;
 
-
 }
 
 template<class T>
 std::ostream& operator<<(std::ostream& os, const DoubleHeap<T>& heap) {
 	return heap.print(os);
 }
-
 
 } // namespace ibex
 

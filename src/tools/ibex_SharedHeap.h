@@ -51,11 +51,19 @@ public:
 	/**
 	 * \brief Create a shared heap.
 	 *
-	 * \param cost                     - the cost function for each element
+	 * \param cost1                     - the cost function for each element
+	 * \param cost2                     - the cost function for each element
+	 * \param cost3                     - the cost function for each element
+	 * \param cost4                     - the cost function for each element
+	 * \param cost5                     - the cost function for each element
+	 * \param cost6                     - the cost function for each element
+	 * \param cost7                     - the cost function for each element
+	 * \param cost8                     - the cost function for each element
 	 * \param update_cost_when_sorting - whether the cost is recalculated or not, when the heap is sorted
 	 * \param id                       - the identifier of this heap.
 	 */
-	SharedHeap(CostFunc<T>& cost, bool update_cost_when_sorting, int id);
+	SharedHeap(CostFunc<T>& cost1, CostFunc<T>& cost2, CostFunc<T>& cost3, CostFunc<T>& cost4, CostFunc<T>& cost5,
+	CostFunc<T>& cost6, CostFunc<T>& cost7, CostFunc<T>& cost8, bool update_cost_when_sorting, int id);
 
 	/** Constructor by copy */
 	SharedHeap(const SharedHeap<T>& heap, int nb_crit, bool deep_copy);
@@ -90,23 +98,6 @@ public:
 	T* top() const;
 
 	/**
-	 * \brief Change Cost Function.
-	 *
-	 *
-	 */
-    void setCostFunction(const CostFunc<T>& newCostFunc);
-
-	/**
-	 * \brief Value Update Cost When Sorting.
-	 *
-	 *
-	 */
-    // Método para cambiar si se actualiza el costo al ordenar
-    void setUpdateCostWhenSorting(bool newUpdateCostWhenSorting);
-
-
-
-	/**
 	 * \brief Return the minimum (the criterion for
 	 *        the first element)
 	 */
@@ -121,19 +112,39 @@ public:
 	void sort();
 
 	/**
+	 * \brief Change the index of the cost function
+	 *        
+	 */
+	void setIndexFunction(int index);
+
+	/**
+	 * \brief Get the index of the cost function
+	 *        
+	 */
+
+	int getIndexFunction();
+	/**
 	 * \brief Count the number of nodes pushed since
 	 *         the object is created. */
 	unsigned int nb_nodes;
 
 	/**
-	 * \brief Cost function associated to this heap
+	 * \brief Cost functions associated to this heap
 	 */
-	CostFunc<T>& costf;
+	CostFunc<T>& costf1;
+	CostFunc<T>& costf2;
+	CostFunc<T>& costf3;
+	CostFunc<T>& costf4;
+	CostFunc<T>& costf5;
+	CostFunc<T>& costf6;
+	CostFunc<T>& costf7;
+	CostFunc<T>& costf8;
 
 	/**  \brief Identifier of this heap */
 	const int heap_id;
 
 protected:
+	int indexFunction;
 
 	friend class DoubleHeap<T>;
 
@@ -339,13 +350,16 @@ private:
 
 
 template<class T>
-SharedHeap<T>::SharedHeap(CostFunc<T>& cost, bool update_cost, int id) : nb_nodes(0), costf(cost), heap_id(id), root(NULL), update_cost_when_sorting(update_cost) {
+SharedHeap<T>::SharedHeap(CostFunc<T>& cost1, CostFunc<T>& cost2, CostFunc<T>& cost3, CostFunc<T>& cost4, CostFunc<T>& cost5,
+CostFunc<T>& cost6, CostFunc<T>& cost7, CostFunc<T>& cost8, bool update_cost, int id) : nb_nodes(0), costf1(cost1), costf2(cost2),
+costf3(cost3), costf4(cost4), costf5(cost5), costf6(cost6), costf7(cost7), costf8(cost8), heap_id(id), root(NULL), update_cost_when_sorting(update_cost), indexFunction(0) {
 
 }
 
 template<class T>
 SharedHeap<T>::SharedHeap(const SharedHeap<T>& heap, int nb_crit, bool deep_copy) :
- nb_nodes(heap.nb_nodes), costf(heap.costf), heap_id(heap.heap_id), root(NULL), update_cost_when_sorting(heap.update_cost_when_sorting) {
+ nb_nodes(heap.nb_nodes), costf1(heap.costf1), costf2(heap.costf2), costf3(heap.costf3), costf4(heap.costf4), costf5(heap.costf5), 
+ costf6(heap.costf6), costf7(heap.costf7), costf8(heap.costf8), heap_id(heap.heap_id), root(NULL), update_cost_when_sorting(heap.update_cost_when_sorting), indexFunction(heap.indexFunction) {
 	if (heap.root != NULL)
 		root = new HeapNode<T>(*(heap.root), NULL, heap_id, nb_crit, deep_copy);
 }
@@ -369,6 +383,7 @@ void SharedHeap<T>::elt_rec(HeapNode<T>* cur, std::vector<HeapElt<T>*> &elm_vect
 template<class T>
 SharedHeap<T>::~SharedHeap() {
 	clear(NODE_ELT);
+	//delete costf;
 }
 
 template<class T>
@@ -417,23 +432,12 @@ T* SharedHeap<T>::top() const {
 }
 
 template<class T>
-void SharedHeap<T>::setCostFunction(const CostFunc<T>& newCostFunc) {
-    costf = newCostFunc;
-	sort();
-}
-
-template<class T>
-void SharedHeap<T>::setUpdateCostWhenSorting(bool newUpdateCostWhenSorting) {
-    update_cost_when_sorting = newUpdateCostWhenSorting;
-}
-
-
-template<class T>
 void SharedHeap<T>::sort() {
-	if (nb_nodes==0) return;
+	if (nb_nodes==0){ return;}
 
-	SharedHeap<T>* heap_tmp = new SharedHeap<T>(costf, update_cost_when_sorting, heap_id);
-
+	SharedHeap<T>* heap_tmp = new SharedHeap<T>(costf1,costf2,costf3,costf4,costf5,costf6,costf7,costf8,update_cost_when_sorting, heap_id);
+	heap_tmp->setIndexFunction(indexFunction);
+	
 	// recursive sort : o(n*log(n))
 	sort_rec(root, *heap_tmp);
 
@@ -447,16 +451,56 @@ void SharedHeap<T>::sort() {
 }
 
 template<class T>
+void SharedHeap<T>::setIndexFunction(int index) {
+	indexFunction = index;
+	sort();
+}
+
+template<class T>
+int SharedHeap<T>::getIndexFunction() {
+	return indexFunction;
+}
+
+template<class T>
 inline double SharedHeap<T>::cost(const T& data) const {
-	return costf.cost(data);
+
+    switch (indexFunction) {
+		case 0:
+			return costf1.cost(data);
+			break;
+        case 1:
+            return costf2.cost(data);
+            break;
+        case 2:
+            return costf3.cost(data);
+            break;
+        case 3:
+            return costf4.cost(data);
+            break;
+		case 4:
+			return costf5.cost(data);
+			break;
+		case 5:
+			return costf6.cost(data);
+			break;
+		case 6:
+			return costf7.cost(data);
+			break;
+		case 7:
+			return costf8.cost(data);
+			break;
+        default:
+            std::cout << "No Valid Index" << std::endl;
+            break;	
+	}
 }
 
 template<class T>
 void SharedHeap<T>::sort_rec(HeapNode<T>* node, SharedHeap<T>& heap) {
 
-	if (update_cost_when_sorting)
+	if (update_cost_when_sorting){
 		node->elt->crit[heap_id] = cost(*(node->elt->data));
-
+	}
 	heap.push_elt(node->elt);
 	if (node->left)	 sort_rec(node->left, heap);
 	if (node->right) sort_rec(node->right, heap);

@@ -73,8 +73,7 @@ public:
 	 *
 	 */
 	Optimizer(int n, Ctc& ctc, Bsc& bsc, LoupFinder& finder, CellBufferOptim& buffer,
-			int goal_var,
-			double eps_x=OptimizerConfig::default_eps_x,
+			int goal_var, double eps_x=OptimizerConfig::default_eps_x,
 			double rel_eps_f=OptimizerConfig::default_rel_eps_f,
 			double abs_eps_f=OptimizerConfig::default_abs_eps_f);
 
