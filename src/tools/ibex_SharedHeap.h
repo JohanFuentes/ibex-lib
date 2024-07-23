@@ -490,8 +490,7 @@ inline double SharedHeap<T>::cost(const T& data) const {
 			return costf8.cost(data);
 			break;
         default:
-            std::cout << "No Valid Index" << std::endl;
-            break;	
+			throw std::runtime_error("No Valid Index");
 	}
 }
 

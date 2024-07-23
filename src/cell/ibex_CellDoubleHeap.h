@@ -193,8 +193,7 @@ inline CellCostFunc& CellDoubleHeap::cost2(){
 			return (CellCostFunc&) heap2->costf8;
 			break;
         default:
-            std::cout << "No Valid Index" << std::endl;
-            break;	
+			throw std::runtime_error("No Valid Index");
 	}	
 }
 

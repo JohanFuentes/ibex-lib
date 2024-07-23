@@ -13,11 +13,16 @@
 #include "ibex_NoBisectableVariableException.h"
 #include "ibex_BxpOptimData.h"
 #include "ibex_CovOptimData.h"
+#include "ibex_CellBeamSearch.h"
+#include "ibex_SimpleBandit.h"
 #include <typeinfo>
 #include <float.h>
 #include <stdlib.h>
 #include <iomanip>
-#include "ibex_CellBeamSearch.h"
+
+//Eliminar
+#include <fstream>
+//
 
 using namespace std;
 
@@ -417,17 +422,29 @@ Optimizer::Status Optimizer::optimize() {
 	Timer timer;
 	timer.start();
 	int option = 0;
+	ofstream myfile("ContenidoEjecucion.txt");
 
 	update_uplo();
+
+	myfile<<"uplo: "<<uplo<<endl;
+	myfile<<"uplo_of_epsboxes: "<<uplo_of_epsboxes<<endl;
+	myfile<<"loup: "<<loup<<endl<<endl;
 
 	try {
 		//Cast to CellBeamSearch for use of setCost2Function
 		CellBeamSearch * thebuffer = dynamic_cast<CellBeamSearch*>(&buffer);
+		SimpleBandit * bandit = new SimpleBandit(thebuffer, 8, 0.2);
+		bandit->loadVectorsFromFile();
 	    
 		while (!buffer.empty()) {
-
+			
 			loup_changed=false;
-
+			myfile<<"Principio del while"<<endl<<endl;
+			myfile<<"ALL BUFFER SIZE: "<<thebuffer->size()<<endl; //Linea agregada, para ver el tamaño del buffer global
+			myfile<<"THE CURRENT BUFFER SIZE: "<<thebuffer->currentbuffer.size()<<endl; //Linea agregada, para ver el tamaño del buffer Prioridad 1
+			myfile<<"THE FUTURE BUFFER SIZE: "<<thebuffer->futurebuffer.size()<<endl; //Linea agregada, para ver el tamaño del buffer -> Prioridad 2
+			myfile<<"THE HEAP BUFFER SIZE: "<<thebuffer->CellDoubleHeap::size()<<endl<<endl; //Linea agregada, para ver el tamaño del buffer -> Prioridad 3
+	
 			//Set the cost function for the buffer
 			/*
 				0:LB
@@ -440,10 +457,10 @@ Optimizer::Status Optimizer::optimize() {
 				7:PF_UB
 			*/
 
-			thebuffer->setCost2Function(option);
-			option++;
+			//thebuffer->setCost2Function(option);
+			//option++;
 
-			if (option == 8){option = 0;}
+			//if (option == 8){option = 0;}
 
 			// for double heap , choose randomly the buffer : top  has to be called before pop
 			Cell *c = buffer.top();
@@ -453,17 +470,53 @@ Optimizer::Status Optimizer::optimize() {
 
 				pair<Cell*,Cell*> new_cells=bsc.bisect(*c);
 				buffer.pop();
+
+				// VERIFICAR SI FUE CAMBIADA LA FUNCION DE COSTO PARA EXPLORAR (BAND = TRUE ?).
+				// SI FUE CAMBIADA (BAND = TRUE), SE DEBE ESCOGER UNA FUNCION DE COSTO PARA EXPLOTAR.
+				// SE DEBE RESETEAR LA VARIABLE BAND A FALSE.
+				bandit->MonitoringChange();
+
+				myfile<<"Despues del pop"<<endl<<endl;
+
+				myfile<<"uplo: "<<uplo<<endl;
+				myfile<<"uplo_of_epsboxes: "<<uplo_of_epsboxes<<endl;
+				myfile<<"loup: "<<loup<<endl<<endl;
+				myfile<<"ALL BUFFER SIZE: "<<thebuffer->size()<<endl; //Linea agregada, para ver el tamaño del buffer global
+				myfile<<"THE CURRENT BUFFER SIZE: "<<thebuffer->currentbuffer.size()<<endl; //Linea agregada, para ver el tamaño del buffer Prioridad 1
+				myfile<<"THE FUTURE BUFFER SIZE: "<<thebuffer->futurebuffer.size()<<endl; //Linea agregada, para ver el tamaño del buffer -> Prioridad 2
+				myfile<<"THE HEAP BUFFER SIZE: "<<thebuffer->CellDoubleHeap::size()<<endl<<endl; //Linea agregada, para ver el tamaño del buffer -> Prioridad 3
+
 				delete c; // deletes the cell.
 
 				nb_cells+=2;  // counting the cells handled ( in previous versions nb_cells was the number of cells put into the buffer after being handled)
 
 				handle_cell(*new_cells.first);
+
+				myfile<<"Despues del Handle cell First"<<endl<<endl;
+				myfile<<"uplo: "<<uplo<<endl;
+				myfile<<"uplo_of_epsboxes: "<<uplo_of_epsboxes<<endl;
+				myfile<<"loup: "<<loup<<endl<<endl;
+				myfile<<"ALL BUFFER SIZE: "<<thebuffer->size()<<endl; //Linea agregada, para ver el tamaño del buffer global
+				myfile<<"THE CURRENT BUFFER SIZE: "<<thebuffer->currentbuffer.size()<<endl; //Linea agregada, para ver el tamaño del buffer Prioridad 1
+				myfile<<"THE FUTURE BUFFER SIZE: "<<thebuffer->futurebuffer.size()<<endl; //Linea agregada, para ver el tamaño del buffer -> Prioridad 2
+				myfile<<"THE HEAP BUFFER SIZE: "<<thebuffer->CellDoubleHeap::size()<<endl<<endl; //Linea agregada, para ver el tamaño del buffer -> Prioridad 3
+
 				handle_cell(*new_cells.second);
+
+				myfile<<"Despues del Handle cell Second"<<endl<<endl;
+				myfile<<"uplo: "<<uplo<<endl;
+				myfile<<"uplo_of_epsboxes: "<<uplo_of_epsboxes<<endl;
+				myfile<<"loup: "<<loup<<endl<<endl;
+				myfile<<"ALL BUFFER SIZE: "<<thebuffer->size()<<endl; //Linea agregada, para ver el tamaño del buffer global
+				myfile<<"THE CURRENT BUFFER SIZE: "<<thebuffer->currentbuffer.size()<<endl; //Linea agregada, para ver el tamaño del buffer Prioridad 1
+				myfile<<"THE FUTURE BUFFER SIZE: "<<thebuffer->futurebuffer.size()<<endl; //Linea agregada, para ver el tamaño del buffer -> Prioridad 2
+				myfile<<"THE HEAP BUFFER SIZE: "<<thebuffer->CellDoubleHeap::size()<<endl<<endl; //Linea agregada, para ver el tamaño del buffer -> Prioridad 3
 
 				if (uplo_of_epsboxes == NEG_INFINITY) {
 					break;
 				}
 				if (loup_changed) {
+					myfile<<"loup_changed"<<endl;
 					// In case of a new upper bound (loup_changed == true), all the boxes
 					// with a lower bound greater than (loup - goal_prec) are removed and deleted.
 					// Note: if contraction was before bisection, we could have the problem
@@ -473,6 +526,13 @@ Optimizer::Status Optimizer::optimize() {
 					double ymax=compute_ymax();
 
 					buffer.contract(ymax);
+					myfile<<"uplo: "<<uplo<<endl;
+					myfile<<"uplo_of_epsboxes: "<<uplo_of_epsboxes<<endl;
+					myfile<<"loup: "<<loup<<endl<<endl;
+					myfile<<"ALL BUFFER SIZE: "<<thebuffer->size()<<endl; //Linea agregada, para ver el tamaño del buffer global
+					myfile<<"THE CURRENT BUFFER SIZE: "<<thebuffer->currentbuffer.size()<<endl; //Linea agregada, para ver el tamaño del buffer Prioridad 1
+					myfile<<"THE FUTURE BUFFER SIZE: "<<thebuffer->futurebuffer.size()<<endl; //Linea agregada, para ver el tamaño del buffer -> Prioridad 2
+					myfile<<"THE HEAP BUFFER SIZE: "<<thebuffer->CellDoubleHeap::size()<<endl<<endl; //Linea agregada, para ver el tamaño del buffer -> Prioridad 3
 
 					//cout << " now buffer is contracted and min=" << buffer.minimum() << endl;
 
@@ -483,6 +543,19 @@ Optimizer::Status Optimizer::optimize() {
 					}
 				}
 				update_uplo();
+				myfile<<"FINAL"<<endl<<endl;
+				myfile<<"uplo: "<<uplo<<endl;
+				myfile<<"uplo_of_epsboxes: "<<uplo_of_epsboxes<<endl;
+				myfile<<"loup: "<<loup<<endl<<endl;
+				myfile<<endl<<endl<<"-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"<<loup<<endl<<endl;
+
+				bandit->adder(loup_changed);
+				bandit->MonitoringSize();
+				// EN ESTA PARTE SE DEBE VERIFICAR SI EL FUTURE_BUFFER ESTA VACIO.
+				// SI ESTA VACIO SE DEBE SELECCIONAR UNA FUNCION DE COSTO PARA EXPLORAR.
+				// SE ESCOGERA UNA CELDA DEL HEAP_BUFFER Y ESTE SELECCIONARA CON LA FUNCION DE COSTO ACA ASIGNADA.
+				// UNA VEZ SELECCIONADA LA FUNCION DE COSTO, SE DEBE ACTIVAR UNA VARIABLE A TRUE, PARA QUE SEPA QUE
+				// FUE CAMBIADA LA FUNCION DE COSTO. (BAND = TRUE)
 
 				if (!anticipated_upper_bounding) // useless to check precision on objective if 'true'
 					if (get_obj_rel_prec()<rel_eps_f || get_obj_abs_prec()<abs_eps_f)
@@ -493,14 +566,27 @@ Optimizer::Status Optimizer::optimize() {
 
 			}
 			catch (NoBisectableVariableException& ) {
+				myfile<<"NoBisectableVariableException"<<endl<<endl;
 				update_uplo_of_epsboxes((c->box)[goal_var].lb());
 				buffer.pop();
 				delete c; // deletes the cell.
 				update_uplo(); // the heap has changed -> recalculate the uplo (eg: if not in best-first search)
+				myfile<<"uplo: "<<uplo<<endl;
+				myfile<<"uplo_of_epsboxes: "<<uplo_of_epsboxes<<endl;
+				myfile<<"loup: "<<loup<<endl<<endl;
+				myfile<<endl<<endl<<"-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"<<loup<<endl<<endl;
 
+				bandit->MonitoringSize();
+				// EN ESTA PARTE SE DEBE VERIFICAR SI EL FUTURE_BUFFER ESTA VACIO.
+				// SI ESTA VACIO SE DEBE SELECCIONAR UNA FUNCION DE COSTO PARA EXPLORAR.
+				// SE ESCOGERA UNA CELDA DEL HEAP_BUFFER Y ESTE SELECCIONARA CON LA FUNCION DE COSTO ACA ASIGNADA.
+				// UNA VEZ SELECCIONADA LA FUNCION DE COSTO, SE DEBE ACTIVAR UNA VARIABLE A TRUE, PARA QUE SEPA QUE
+				// FUE CAMBIADA LA FUNCION DE COSTO. (BAND = TRUE)
 			}
 		}
 
+		bandit->printQ();
+		bandit->saveVectorsToFile();
 	 	timer.stop();
 	 	time = timer.get_time();
 
@@ -520,7 +606,7 @@ Optimizer::Status Optimizer::optimize() {
 	catch (TimeOutException& ) {
 		status = TIME_OUT;
 	}
-
+	myfile.close();
 	/* TODO: cannot retrieve variable names here. */
 	for (int i=0; i<(extended_COV ? n+1 : n); i++)
 		cov->data->_optim_var_names.push_back(string(""));

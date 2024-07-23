@@ -83,7 +83,7 @@ public :
 	/** \brief The default value for the maximum beam size */
 	static constexpr unsigned int default_beamsize = 1;
 
-protected : //Linea comentado para poder acceder a los metodos
+//protected : //Linea comentado para poder acceder a los metodos
 	/**
 	 * \brief Return the cost of a cell
 	 *
