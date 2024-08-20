@@ -18,8 +18,10 @@ target_sources (ibex PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/ibex_OptimMemory.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ibex_UnconstrainedLocalSearch.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ibex_UnconstrainedLocalSearch.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/ibex_SimpleBandit.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ibex_SimpleBandit.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ibex_Bandit.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ibex_Bandit.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ibex_Sarsa.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ibex_Sarsa.h
 )
 
 target_include_directories (ibex PUBLIC

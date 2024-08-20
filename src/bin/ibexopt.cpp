@@ -131,33 +131,37 @@ int main(int argc, char** argv) {
 		}
 
 		if (!quiet) {
-			cout << endl << "************************ setup ************************" << endl;
-			cout << "  file loaded:\t\t" << filename.Get() << endl;
+			//cout << endl << "************************ setup ************************" << endl;
+			//cout << "  file loaded:\t\t" << filename.Get() << endl;
 		}
 
 		if (rel_eps_f) {
 			config.set_rel_eps_f(rel_eps_f.Get());
 
-			if (!quiet)
-				cout << "  rel-eps-f:\t\t" << rel_eps_f.Get() << "\t(relative precision on objective)" << endl;
+			if (!quiet){
+				//cout << "  rel-eps-f:\t\t" << rel_eps_f.Get() << "\t(relative precision on objective)" << endl;
+			}
 		}
 
 		if (abs_eps_f) {
 			config.set_abs_eps_f(abs_eps_f.Get());
-			if (!quiet)
-				cout << "  abs-eps-f:\t\t" << abs_eps_f.Get() << "\t(absolute precision on objective)" << endl;
+			if (!quiet){
+				//cout << "  abs-eps-f:\t\t" << abs_eps_f.Get() << "\t(absolute precision on objective)" << endl;
+			}
 		}
 
 		if (eps_h) {
 			config.set_eps_h(eps_h.Get());
-			if (!quiet)
-				cout << "  eps-h:\t\t" << eps_h.Get() << "\t(equality thickening)" << endl;
+			if (!quiet){
+				//cout << "  eps-h:\t\t" << eps_h.Get() << "\t(equality thickening)" << endl;
+			}
 		}
 
 		if (eps_x) {
 			config.set_eps_x(eps_x.Get());
-			if (!quiet)
-				cout << "  eps-x:\t\t" << eps_x.Get() << "\t(precision on variables domain)" << endl;
+			if (!quiet){
+				//cout << "  eps-x:\t\t" << eps_x.Get() << "\t(precision on variables domain)" << endl;
+			}
 		}
 
 		// This option certifies feasibility with equalities
@@ -225,7 +229,7 @@ int main(int argc, char** argv) {
 		}
 
 		if (!quiet) {
-			cout << "  output COV file:\t" << output_cov_file << "\n";
+			//cout << "  output COV file:\t" << output_cov_file << "\n";
 		}
 
 		// This option limits the search time
@@ -255,7 +259,7 @@ int main(int argc, char** argv) {
 		}
 		
 		if (!quiet) {
-			cout << "*******************************************************" << endl << endl;
+			//cout << "*******************************************************" << endl << endl;
 		}
 		
 		// Build the default optimizer
@@ -265,7 +269,7 @@ int main(int argc, char** argv) {
 		cout.precision(12);
 		
 		if (!quiet)
-			cout << "running............" << endl << endl;
+			//cout << "running............" << endl << endl;
 		
 		// Search for the optimum
 		// Get the solutions
@@ -290,9 +294,10 @@ int main(int argc, char** argv) {
 		o.get_data().save(output_cov_file.c_str());
 		
 		if (!quiet) {
-			cout << " results written in " << output_cov_file << "\n";
-			if (overwitten)
-				cout << " (old file saved in " << cov_copy << ")\n";
+			//cout << " results written in " << output_cov_file << "\n";
+			if (overwitten){
+				//cout << " (old file saved in " << cov_copy << ")\n";
+			}
 		}
 
 		delete sys;

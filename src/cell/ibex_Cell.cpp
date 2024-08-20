@@ -18,11 +18,11 @@ using namespace std;
 
 namespace ibex {
 
-Cell::Cell(const IntervalVector& box, int var, unsigned int depth) : box(box), prop(this->box), bisected_var(var), depth(depth) {
+Cell::Cell(const IntervalVector& box, int var, unsigned int depth, int d) : box(box), prop(this->box), bisected_var(var), depth(depth), d(d) {
 
 }
 
-Cell::Cell(const Cell& e) : box(e.box), prop(this->box, e.prop), bisected_var(e.bisected_var), depth(e.depth) {
+Cell::Cell(const Cell& e) : box(e.box), prop(this->box, e.prop), bisected_var(e.bisected_var), depth(e.depth), d(e.d) {
 
 }
 
@@ -51,6 +51,14 @@ pair<Cell*,Cell*> Cell::bisect(const BisectionPoint& pt) const {
 
 Cell::~Cell() {
 
+}
+
+int Cell::get_d(){
+	return d;
+}
+
+void Cell::set_d(int new_d){
+	d = new_d;
 }
 
 std::ostream& operator<<(std::ostream& os, const Cell& c) {

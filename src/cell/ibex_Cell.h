@@ -46,7 +46,7 @@ public:
 	 *
 	 * \param box - Box (passed by copy).
 	 */
-	explicit Cell(const IntervalVector& box, int bisected_var=-1, unsigned int depth=0);
+	explicit Cell(const IntervalVector& box, int bisected_var=-1, unsigned int depth=0, int d=0);
 
 	/**
 	 * \brief Constructor by copy.
@@ -93,6 +93,12 @@ public:
 	 * Cell depth (0 if root node).
 	 */
 	unsigned int depth;
+
+	int d;
+
+	int get_d();
+
+	void set_d(int new_d);
 };
 
 /**
