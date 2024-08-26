@@ -16,6 +16,7 @@
 #include "ibex_CellBeamSearch.h"
 #include "ibex_Bandit.h"
 #include "ibex_Sarsa.h"
+#include "ibex_Strategy.h"
 #include <typeinfo>
 #include <float.h>
 #include <stdlib.h>
@@ -431,10 +432,20 @@ Optimizer::Status Optimizer::optimize() {
 		//Cast to CellBeamSearch for use of setCost2Function
 		CellBeamSearch * thebuffer = dynamic_cast<CellBeamSearch*>(&buffer);
 
-		Sarsa * sarsa = new Sarsa(thebuffer, 8, 0.1);
-		sarsa->modeTraining();
-		sarsa->updateWidth(loup,uplo);
-		sarsa->StartExploration();
+		Strategy* strategy = nullptr;
+
+		bool useSarsa = false;
+
+        if (useSarsa) {
+            strategy = new Sarsa(thebuffer, 8, 0.1);
+        } else {
+            strategy = new Bandit(thebuffer, 8, 0.1);
+        }
+
+		//Sarsa * sarsa = new Sarsa(thebuffer, 8, 0.1);
+		strategy->modeTraining();
+		strategy->updateWidth(loup,uplo);
+		strategy->StartExploration();
 
 /*
 		Bandit * bandit = new Bandit(thebuffer, 8, 0.1);
@@ -469,7 +480,7 @@ Optimizer::Status Optimizer::optimize() {
 				}
 				if (loup_changed) {
 
-					sarsa->setLoupChanged(true);
+					strategy->setLoupChanged(true);
 
 					// In case of a new upper bound (loup_changed == true), all the boxes
 					// with a lower bound greater than (loup - goal_prec) are removed and deleted.
@@ -491,11 +502,11 @@ Optimizer::Status Optimizer::optimize() {
 				}
 				update_uplo();
 
-				sarsa->updateWidth(loup,uplo);
-				sarsa->MonitoringChange();
-				sarsa->StartExplotation();
-				sarsa->adder(loup_changed);
-				sarsa->MonitoringSize();
+				strategy->updateWidth(loup,uplo);
+				strategy->MonitoringChange();
+				strategy->StartExplotation();
+				strategy->adder(loup_changed);
+				strategy->MonitoringSize();
 /*
 				bandit->MonitoringChange();
 				bandit->StartExplotation();
@@ -517,16 +528,16 @@ Optimizer::Status Optimizer::optimize() {
 				delete c; // deletes the cell.
 				update_uplo(); // the heap has changed -> recalculate the uplo (eg: if not in best-first search)
 
-				sarsa->updateWidth(loup,uplo);
-				sarsa->MonitoringSize();
+				strategy->updateWidth(loup,uplo);
+				strategy->MonitoringSize();
 
 				//bandit->MonitoringSize();
 			}
 		}
 		
 /* QUINTO */ ////////////////////////////////////////////////////////////////////////////////////////////
-		sarsa->saveVectorsToFile();
-		//sarsa->saveLogs(); //No es necesario si no queremos ver como funciona ...
+		strategy->saveVectorsToFile();
+		//strategy->saveLogs(); //No es necesario si no queremos ver como funciona ...
 
 
 		//bandit->saveVectorsToFile();

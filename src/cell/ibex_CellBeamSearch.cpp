@@ -19,7 +19,7 @@ CellBeamSearch::CellBeamSearch(CellDoubleHeap& currentbuffer, CellDoubleHeap& fu
 }
 
 CellBeamSearch::~CellBeamSearch() {
-
+    //std::cout << "Destruyendo CellBeamSearch" << std::endl;
 }
 
 bool CellBeamSearch::empty() const {

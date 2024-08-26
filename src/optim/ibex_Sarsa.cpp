@@ -13,28 +13,14 @@
 namespace ibex {
 
 //constructor
-Sarsa::Sarsa(CellBeamSearch * buffer, int num_actions, double size_step) : buffer(buffer), k(num_actions), alpha(size_step), matrizQ(60, std::vector<double>(num_actions, 0.0)) {
-    epsilon = 0.1;
-    change = false;
-    start = false;
-    loup_changed = false;
-    nb_cells = 0;
-    loup_found = 1;
-    estado_anterior=0;
-    accion_anterior=0;
-    estado_actual=0;
-    accion_actual=0;
-    srand(static_cast<unsigned>(time(0)));
-    width = 0.0;
-    training = false;
+Sarsa::Sarsa(CellBeamSearch * buffer, int num_actions, double size_step) : Strategy(buffer,num_actions,size_step),
+                                                                           matrizQ(60, std::vector<double>(num_actions, 0.0)),
+                                                                           loup_changed(false),
+                                                                           width(0.0)
+{}
 
-}
 
-Sarsa::~Sarsa(){
-    if(buffer != nullptr){
-        delete buffer;
-    }
-}
+Sarsa::~Sarsa(){}
 
 void Sarsa::modeTraining(){
     training = true;
@@ -158,6 +144,8 @@ void Sarsa::updateQ(int actual_state, int future_state, int actual_action, int f
         logStream << matrizQ[actual_state][i] << " ";
     }
 }
+
+void Sarsa::updateQ(int actual_state, int actual_action, double reward){}
 
 void Sarsa::MonitoringSize(){
     if(buffer->futurebuffer.size() == 0){
@@ -357,6 +345,8 @@ int Sarsa::ActualState(bool searchType, double width, int activeNodes, bool loup
     return state;
 
 }
+
+int Sarsa::ActualState(bool searchType){return 0;}
 
 void Sarsa::StartExploration() {
     loadVectorsFromFile();

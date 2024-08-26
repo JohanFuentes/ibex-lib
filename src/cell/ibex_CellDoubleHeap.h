@@ -137,8 +137,18 @@ CellCostFunc::criterion crit6, CellCostFunc::criterion crit7, CellCostFunc::crit
 
 inline CellDoubleHeap::~CellDoubleHeap() {
 	flush();
-	delete &cost1();
-	delete &cost2();
+	//delete &cost1();
+	//delete &cost2();
+
+	delete &(CellCostFunc&) heap1->costf1;
+	//delete &(CellCostFunc&) heap2->costf1;
+	delete &(CellCostFunc&) heap2->costf2;
+	delete &(CellCostFunc&) heap2->costf3;
+	delete &(CellCostFunc&) heap2->costf4;
+	delete &(CellCostFunc&) heap2->costf5;
+	delete &(CellCostFunc&) heap2->costf6;
+	delete &(CellCostFunc&) heap2->costf7;
+	delete &(CellCostFunc&) heap2->costf8;
 }
 
 inline void CellDoubleHeap::contract(double new_loup) {

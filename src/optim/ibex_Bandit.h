@@ -10,30 +10,16 @@
 #include <sstream>
 #include <fstream>
 #include <string>
+#include "ibex_Strategy.h"
 #include "ibex_CellBeamSearch.h"
-
 
 namespace ibex {
 
-class Bandit {
+class Bandit : public Strategy {
 
 private:
 
-    CellBeamSearch * buffer;
-    double epsilon;          // Probabilidad de exploración
-    double alpha;            // Tasa de aprendizaje
-    int k;                   // Número de acciones
-    bool change;
-    int nb_cells;
-    int loup_found;
-    int estado_anterior;
-    int accion_anterior;
-    int estado_actual;
-    int accion_actual;
-    std::ostringstream logStream;  // Para acumular los mensajes de log
     std::vector<std::vector<double>> matrizQ; // Matriz de 2D
-    bool start; // Para saber si es la primera iteración del algoritmo
-    bool training;
 
 public:
 
@@ -52,8 +38,6 @@ public:
 
     int selectAction(int state);
 
-    void updateQ(int actual_state, int actual_action, double reward);
-
     void MonitoringSize();
 
     void MonitoringChange();
@@ -70,8 +54,6 @@ public:
 
     void loadVectorsFromFile();
 
-    int ActualState(bool searchType);
-
     void StartExploration();
         
     void StartExplotation();
@@ -85,6 +67,20 @@ public:
     int getPastAction();
 
     void saveLogs();
+
+    void updateQ(int actual_state, int actual_action, double reward);
+    void updateQ(int actual_state, int future_state, int actual_action, int future_action, double reward);
+
+    int ActualState(bool searchType, double width, int activeNodes, bool loupChange);
+    int ActualState(bool searchType);
+
+    int getWidthCategory(double w);
+
+    int getActiveNodesCategory(int an);
+
+    void setLoupChanged(bool loupChange);
+
+    void updateWidth(double loup, double uplo);
 
 };
 
