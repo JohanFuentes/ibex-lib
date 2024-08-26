@@ -3,8 +3,8 @@
 #include <cmath>
 #include <random>
 #include <algorithm>
-#include <cstdlib>  // Para rand() y srand()
-#include <ctime>    // Para time()
+#include <cstdlib>
+#include <ctime>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -12,7 +12,6 @@
 
 namespace ibex {
 
-//constructor
 Sarsa::Sarsa(CellBeamSearch * buffer, int num_actions, double size_step) : Strategy(buffer,num_actions,size_step),
                                                                            matrizQ(60, std::vector<double>(num_actions, 0.0)),
                                                                            loup_changed(false),
@@ -93,12 +92,11 @@ int Sarsa::selectAction(int state){
         
         logStream << "Seleccion Greedy:" << std::endl;
         
-        // Selección greedy
+        // Greedy selection
         std::vector<int> max_indices;
         double max_value = *std::max_element(matrizQ[state].begin(), matrizQ[state].end());
-        //std::cout<<"Greedy"<<std::endl;
 
-        //Recorrer matrizQ[state]
+        //Travel matrizQ[state]
         logStream << "Vector Q:" << std::endl;
         for (size_t i = 0; i < matrizQ[state].size(); ++i) {
             logStream << matrizQ[state][i] << " ";
@@ -114,14 +112,12 @@ int Sarsa::selectAction(int state){
 
         action = max_indices[randomAction];
         
-        //std::cout<<"Action: "<<action<<std::endl;
         logStream << "Accion escogida: "<<action<<std::endl<<std::endl;
     } else {
-        //std::cout<<"Exploration"<<std::endl;
-        // Selección aleatoria
+        // Random selection
         logStream << "Seleccion Aleatoria:" << std::endl;
         int randomAction = generateRandomInt(matrizQ[state].size());
-        //std::cout<<randomAction<<std::endl;
+
         action = randomAction;
         logStream << "Accion escogida: "<<action<<std::endl<<std::endl;
     }
@@ -131,7 +127,7 @@ int Sarsa::selectAction(int state){
 
 void Sarsa::updateQ(int actual_state, int future_state, int actual_action, int future_action, double reward){
 
-    //Recorrer matrizQ[state]
+    //Travel matrizQ[state]
     logStream << "Q Antes:" << std::endl;
     for (size_t i = 0; i < matrizQ[actual_state].size(); ++i) {
         logStream << matrizQ[actual_state][i] << " ";
@@ -227,9 +223,9 @@ void Sarsa::MonitoringChange(){
 void Sarsa::printQ(){
     for (const auto& fila : matrizQ) {
         for (int elemento : fila) {
-            std::cout << elemento << "\t";  // Usamos tabulación para alinear los elementos
+            std::cout << elemento << "\t";
         }
-        std::cout << std::endl;  // Nueva línea al final de cada fila
+        std::cout << std::endl;
     }
 }
 
@@ -252,29 +248,25 @@ void Sarsa::saveVectorsToFile(){
 
     if(training){
 
-        // Abrir un archivo de texto para escribir
         std::ofstream file("MatrixQSarsa.txt");
         if (!file.is_open()) {
             //std::cerr << "Error al abrir el archivo para escritura." << std::endl;
 
         }else{
-            // Escribir los elementos de la matriz en el archivo
+
             for (const auto& fila : matrizQ) {
                 for (int elemento : fila) {
-                    file << elemento << " ";  // Separar cada elemento con un espacio
+                    file << elemento << " ";
                 }
-                file << "\n";  // Nueva línea al final de cada fila
+                file << "\n";
             }
 
-            // Cerrar el archivo
             file.close();
 
-            //std::cout << "Matriz guardada en 'MatrixQ.txt'." << std::endl;
         }
 
     }
 }
-
 
 void Sarsa::loadVectorsFromFile() {
         std::ifstream file("MatrixQSarsa.txt");
@@ -290,9 +282,9 @@ void Sarsa::loadVectorsFromFile() {
 
                 while (iss >> valor) {
                     if (filaIndex < matrizQ.size() && colIndex < matrizQ[filaIndex].size()) {
-                        matrizQ[filaIndex][colIndex] = valor;  // Actualiza el valor existente
+                        matrizQ[filaIndex][colIndex] = valor;
                     } else if (filaIndex < matrizQ.size()) {
-                        matrizQ[filaIndex].push_back(valor);  // Añade un nuevo valor si la columna no existe
+                        matrizQ[filaIndex].push_back(valor);
                     }
                     colIndex++;
                 }
@@ -332,13 +324,13 @@ int Sarsa::ActualState(bool searchType, double width, int activeNodes, bool loup
     int widthCategory = getWidthCategory(width);
     int activeNodesCategory = getActiveNodesCategory(activeNodes);
 
-    //int index = -1; // Inicializamos con un valor que indica "no válido" por defecto
+    //int index = -1; // Value not valid for default
 
     if (!searchType) {
-        // Cuando searchType es False, consideramos solo width y loupChange (10 combinaciones posibles)
+        // When searchType it's False, considerate only width and loupChange (10 possible combinations)
         state = widthCategory * 2 + (loupChange ? 1 : 0);
     } else {
-        // Cuando searchType es True, consideramos todas las variables (50 combinaciones posibles)
+        // When searchType it's True, considerate all the variables (50 possible combinations)
         state = 10 + (widthCategory * 10 + activeNodesCategory * 2 + (loupChange ? 1 : 0));
     }
 
@@ -405,11 +397,11 @@ int Sarsa::getPastAction(){
 }
 
 void Sarsa::saveLogs() {
-    std::ofstream file("Logs.txt", std::ios::app);  // Abre el archivo en modo append
+    std::ofstream file("Logs.txt", std::ios::app);
     if (file.is_open()) {
-        file << logStream.str();  // Escribe los logs acumulados al archivo
-        logStream.str("");  // Limpia el stream si deseas reutilizarlo
-        logStream.clear();  // Limpia banderas de error
+        file << logStream.str();
+        logStream.str("");
+        logStream.clear();
     } else {
         //std::cerr << "Failed to open the log file." << std::endl;
     }

@@ -428,13 +428,14 @@ Optimizer::Status Optimizer::optimize() {
 
 	update_uplo();
 
+	Strategy* strategy = nullptr;
+
 	try {
 		//Cast to CellBeamSearch for use of setCost2Function
 		CellBeamSearch * thebuffer = dynamic_cast<CellBeamSearch*>(&buffer);
 
-		Strategy* strategy = nullptr;
-
 		bool useSarsa = false;
+		bool training = false;
 
         if (useSarsa) {
             strategy = new Sarsa(thebuffer, 8, 0.1);
@@ -442,15 +443,12 @@ Optimizer::Status Optimizer::optimize() {
             strategy = new Bandit(thebuffer, 8, 0.1);
         }
 
-		//Sarsa * sarsa = new Sarsa(thebuffer, 8, 0.1);
-		strategy->modeTraining();
+		if (training){
+			strategy->modeTraining();
+		}
+
 		strategy->updateWidth(loup,uplo);
 		strategy->StartExploration();
-
-/*
-		Bandit * bandit = new Bandit(thebuffer, 8, 0.1);
-		bandit->StartExploration();		
-*/		
 
 		while (!buffer.empty()) {
 			
@@ -507,12 +505,6 @@ Optimizer::Status Optimizer::optimize() {
 				strategy->StartExplotation();
 				strategy->adder(loup_changed);
 				strategy->MonitoringSize();
-/*
-				bandit->MonitoringChange();
-				bandit->StartExplotation();
-				bandit->adder(loup_changed);
-				bandit->MonitoringSize();
-*/
 
 				if (!anticipated_upper_bounding) // useless to check precision on objective if 'true'
 					if (get_obj_rel_prec()<rel_eps_f || get_obj_abs_prec()<abs_eps_f)
@@ -530,21 +522,14 @@ Optimizer::Status Optimizer::optimize() {
 
 				strategy->updateWidth(loup,uplo);
 				strategy->MonitoringSize();
-
-				//bandit->MonitoringSize();
 			}
 		}
 		
-/* QUINTO */ ////////////////////////////////////////////////////////////////////////////////////////////
 		strategy->saveVectorsToFile();
-		//strategy->saveLogs(); //No es necesario si no queremos ver como funciona ...
-
-
-		//bandit->saveVectorsToFile();
-		//bandit->saveLogs(); //No es necesario si no queremos ver como funciona ...
-/* */ ////////////////////////////////////////////////////////////////////////////////////////////
+		//strategy->saveLogs(); //No es necesario si no queremos ver como funciona ...	
 		
-		
+		//delete strategy;
+
 		timer.stop();
 	 	time = timer.get_time();
 
@@ -602,6 +587,8 @@ Optimizer::Status Optimizer::optimize() {
 		delete buffer.pop();
 	}
 
+	delete strategy;
+
 	return status;
 }
 
@@ -634,7 +621,7 @@ const char* white() {
 
 void Optimizer::report() {
 
-/*
+
 	if (!cov || !buffer.empty()) { // not started
 		cout << " not started." << endl;
 		return;
@@ -703,7 +690,7 @@ void Optimizer::report() {
 		cout << " [total=" << cov->nb_cells() << "]";
 	cout << endl << endl;
 
-*/
+
 
 	//For use automatic tests
 	cout <<nb_cells<<" "<<time<<endl;

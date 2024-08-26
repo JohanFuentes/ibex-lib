@@ -3,7 +3,6 @@
 
 namespace ibex {
 
-//constructor
 Strategy::Strategy(CellBeamSearch * buffer, int num_actions, double size_step) : buffer(buffer), k(num_actions), alpha(size_step) {
     epsilon = 0.1;
     change = false;
@@ -18,10 +17,6 @@ Strategy::Strategy(CellBeamSearch * buffer, int num_actions, double size_step) :
     training = false;
 }
 
-Strategy::~Strategy(){
-    if(buffer != nullptr){
-        delete buffer;
-    }
-}
+Strategy::~Strategy(){}
 
 } // end namespace ibex

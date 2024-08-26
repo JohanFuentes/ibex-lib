@@ -5,8 +5,8 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
-#include <cstdlib>  // Para rand() y srand()
-#include <ctime>    // Para time()
+#include <cstdlib>
+#include <ctime>
 #include <sstream>
 #include <fstream>
 #include <string>
@@ -19,11 +19,10 @@ class Bandit : public Strategy {
 
 private:
 
-    std::vector<std::vector<double>> matrizQ; // Matriz de 2D
+    std::vector<std::vector<double>> matrizQ; // Matrix Q to store the values of each state-action pair
 
 public:
 
-    //constructor
     Bandit(CellBeamSearch * buffer, int num_actions, double size_step);
 
     ~Bandit();

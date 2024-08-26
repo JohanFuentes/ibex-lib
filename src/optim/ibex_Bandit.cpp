@@ -3,8 +3,8 @@
 #include <cmath>
 #include <random>
 #include <algorithm>
-#include <cstdlib>  // Para rand() y srand()
-#include <ctime>    // Para time()
+#include <cstdlib>
+#include <ctime>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -12,7 +12,6 @@
 
 namespace ibex {
 
-//constructor
 Bandit::Bandit(CellBeamSearch * buffer, int num_actions, double size_step) : Strategy(buffer,num_actions,size_step),
                                                                            matrizQ(2, std::vector<double>(num_actions, 0.0))
 {}
@@ -64,7 +63,8 @@ double Bandit::calculateRewardExplotation(){
     return reward;
 }
 
-//Cambiar funcion de costo
+// Change the cost function
+
 int Bandit::selectAction(int state){
 
     int action = -1;
@@ -83,12 +83,11 @@ int Bandit::selectAction(int state){
         
         logStream << "Seleccion Greedy:" << std::endl;
         
-        // Selección greedy
+        // Greedy selection
         std::vector<int> max_indices;
         double max_value = *std::max_element(matrizQ[state].begin(), matrizQ[state].end());
-        //std::cout<<"Greedy"<<std::endl;
 
-        //Recorrer matrizQ[state]
+        // Travel matrizQ[state]
         logStream << "Vector Q:" << std::endl;
         for (size_t i = 0; i < matrizQ[state].size(); ++i) {
             logStream << matrizQ[state][i] << " ";
@@ -103,15 +102,13 @@ int Bandit::selectAction(int state){
         int randomAction = generateRandomInt(max_indices.size());
 
         action = max_indices[randomAction];
-        
-        //std::cout<<"Action: "<<action<<std::endl;
+
         logStream << "Accion escogida: "<<action<<std::endl<<std::endl;
     } else {
-        //std::cout<<"Exploration"<<std::endl;
-        // Selección aleatoria
+        // Random selection
         logStream << "Seleccion Aleatoria:" << std::endl;
         int randomAction = generateRandomInt(matrizQ[state].size());
-        //std::cout<<randomAction<<std::endl;
+
         action = randomAction;
         logStream << "Accion escogida: "<<action<<std::endl<<std::endl;
     }
@@ -121,14 +118,14 @@ int Bandit::selectAction(int state){
 
 void Bandit::updateQ(int actual_state, int actual_action, double reward){
 
-    //Recorrer matrizQ[state]
+    // Travel matrizQ[state]
     logStream << "Q Antes:" << std::endl;
     for (size_t i = 0; i < matrizQ[actual_state].size(); ++i) {
         logStream << matrizQ[actual_state][i] << " ";
     }
 
     matrizQ[actual_state][actual_action] = matrizQ[actual_state][actual_action] + alpha*(reward - matrizQ[actual_state][actual_action]);  
-    //matrizQ[actual_state][actual_action] = matrizQ[actual_state][actual_action] + alpha*(reward - matrizQ[actual_state][actual_action]);   
+   
     logStream << std::endl<<"Q Despues:" << std::endl;
     for (size_t i = 0; i < matrizQ[actual_state].size(); ++i) {
         logStream << matrizQ[actual_state][i] << " ";
@@ -213,9 +210,9 @@ void Bandit::MonitoringChange(){
 void Bandit::printQ(){
     for (const auto& fila : matrizQ) {
         for (int elemento : fila) {
-            std::cout << elemento << "\t";  // Usamos tabulación para alinear los elementos
+            std::cout << elemento << "\t";
         }
-        std::cout << std::endl;  // Nueva línea al final de cada fila
+        std::cout << std::endl;
     }
 }
 
@@ -237,24 +234,22 @@ int Bandit::generateRandomInt(int range) {
 void Bandit::saveVectorsToFile(){
 
     if(training){
-        // Abrir un archivo de texto para escribir
+
         std::ofstream file("MatrixQBandit.txt");
         if (!file.is_open()) {
             //std::cerr << "Error al abrir el archivo para escritura." << std::endl;
 
         }else{
-            // Escribir los elementos de la matriz en el archivo
+
             for (const auto& fila : matrizQ) {
                 for (int elemento : fila) {
-                    file << elemento << " ";  // Separar cada elemento con un espacio
+                    file << elemento << " ";
                 }
-                file << "\n";  // Nueva línea al final de cada fila
+                file << "\n";
             }
 
-            // Cerrar el archivo
             file.close();
 
-            //std::cout << "Matriz guardada en 'MatrixQ.txt'." << std::endl;
         }
 
     }
@@ -264,7 +259,7 @@ void Bandit::saveVectorsToFile(){
 void Bandit::loadVectorsFromFile() {
         std::ifstream file("MatrixQBandit.txt");
         if (!file.is_open()) {
-            std::cerr << "Error al abrir el archivo para lectura." << std::endl;
+            //std::cerr << "Error al abrir el archivo para lectura." << std::endl;
         }else{
             std::string linea;
             int filaIndex = 0;
@@ -275,9 +270,9 @@ void Bandit::loadVectorsFromFile() {
 
                 while (iss >> valor) {
                     if (filaIndex < matrizQ.size() && colIndex < matrizQ[filaIndex].size()) {
-                        matrizQ[filaIndex][colIndex] = valor;  // Actualiza el valor existente
+                        matrizQ[filaIndex][colIndex] = valor;
                     } else if (filaIndex < matrizQ.size()) {
-                        matrizQ[filaIndex].push_back(valor);  // Añade un nuevo valor si la columna no existe
+                        matrizQ[filaIndex].push_back(valor);
                     }
                     colIndex++;
                 }
@@ -293,10 +288,10 @@ int Bandit::ActualState(bool searchType){
     int state = -1;
 
     if (!searchType) {
-        // Cuando searchType es False (Explotación)
+        // When searchType it's False (Explotación)
         state = 0;
     } else {
-        // Cuando searchType es True (Exploración)
+        // When searchType it's True (Exploración)
         state = 1;
     }
 
@@ -317,7 +312,7 @@ void Bandit::StartExploration() {
     logStream << "Estado actual: " <<estado_actual<<std::endl;
     logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
 
-    estado_actual = ActualState(true); // Exploración(1)
+    estado_actual = ActualState(true); // Exploration(1)
     accion_actual = selectAction(estado_actual);
     
     logStream << "Se cambio estado actual y accion actual:" << std::endl;
@@ -366,11 +361,11 @@ int Bandit::getPastAction(){
 }
 
 void Bandit::saveLogs() {
-    std::ofstream file("Logs.txt", std::ios::app);  // Abre el archivo en modo append
+    std::ofstream file("Logs.txt", std::ios::app);
     if (file.is_open()) {
-        file << logStream.str();  // Escribe los logs acumulados al archivo
-        logStream.str("");  // Limpia el stream si deseas reutilizarlo
-        logStream.clear();  // Limpia banderas de error
+        file << logStream.str();
+        logStream.str("");
+        logStream.clear();
     } else {
         //std::cerr << "Failed to open the log file." << std::endl;
     }

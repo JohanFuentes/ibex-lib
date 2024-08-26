@@ -5,8 +5,8 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
-#include <cstdlib>  // Para rand() y srand()
-#include <ctime>    // Para time()
+#include <cstdlib>
+#include <ctime>
 #include <sstream>
 #include <fstream>
 #include <string>
@@ -19,13 +19,12 @@ class Sarsa : public Strategy {
 
 private:
 
-    std::vector<std::vector<double>> matrizQ; // Matriz de 2D
-    bool loup_changed;
-    double width;
+    std::vector<std::vector<double>> matrizQ; // Matrix Q to store the values of each state-action pair
+    bool loup_changed;                        // To know if the loup has changed in the last state
+    double width;                             // Global Width (loup - uplo)
 
 public:
 
-    //constructor
     Sarsa(CellBeamSearch * buffer, int num_actions, double size_step);
 
     ~Sarsa();
