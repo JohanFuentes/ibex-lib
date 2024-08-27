@@ -1,0 +1,10 @@
+Benchs/hs103.bch
+Benchs/chembis.bch
+Benchs/disc2.bch
+Benchs/chem-1.bch
+Benchs/m4wd.bch
+Benchs/chem.bch
+Benchs/mistake.bch
+Benchs/hs102.bch
+Benchs/ex7_2_9.bch
+Benchs/batch.bch
