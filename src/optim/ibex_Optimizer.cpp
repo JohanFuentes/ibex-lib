@@ -435,7 +435,7 @@ Optimizer::Status Optimizer::optimize() {
 		CellBeamSearch * thebuffer = dynamic_cast<CellBeamSearch*>(&buffer);
 
 		bool useSarsa = false;
-		bool training = false;
+		bool training = true;
 
         if (useSarsa) {
             strategy = new Sarsa(thebuffer, 8, 0.1);
@@ -621,6 +621,7 @@ const char* white() {
 
 void Optimizer::report() {
 
+/*
 
 	if (!cov || !buffer.empty()) { // not started
 		cout << " not started." << endl;
@@ -690,7 +691,7 @@ void Optimizer::report() {
 		cout << " [total=" << cov->nb_cells() << "]";
 	cout << endl << endl;
 
-
+*/
 
 	//For use automatic tests
 	cout <<nb_cells<<" "<<time<<endl;

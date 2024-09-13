@@ -33,6 +33,7 @@ protected:
     std::ostringstream logStream;   // Log stream to save the logs
     bool start;                     // To know if the search has started
     bool training;                  // To know if the strategy is in training mode
+    bool ruleta;                    // To know if the selection is based on roulette
 
 public:
 

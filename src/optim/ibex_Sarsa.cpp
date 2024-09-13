@@ -91,28 +91,60 @@ int Sarsa::selectAction(int state){
     if (randomNum > epsilon) {
         
         logStream << "Seleccion Greedy:" << std::endl;
-        
-        // Greedy selection
-        std::vector<int> max_indices;
-        double max_value = *std::max_element(matrizQ[state].begin(), matrizQ[state].end());
 
-        //Travel matrizQ[state]
-        logStream << "Vector Q:" << std::endl;
-        for (size_t i = 0; i < matrizQ[state].size(); ++i) {
-            logStream << matrizQ[state][i] << " ";
-        }
+        if(ruleta){
+            logStream << "Usando ruleta:" << std::endl;
 
-        for (size_t i = 0; i < matrizQ[state].size(); ++i) {
-            if (matrizQ[state][i] == max_value) {
-                max_indices.push_back(i);
+            // Selección basada en ruleta
+            std::vector<double> valores = matrizQ[state];
+            double min_val = *std::min_element(valores.begin(), valores.end());
+
+            // Desplazar todos los valores si hay negativos
+            if (min_val < 0) {
+                double ajuste = 1 - min_val;
+                for (double& valor : valores) {
+                    valor += ajuste;
+                }
             }
+
+            // Sumar los valores para calcular la probabilidad acumulada
+            double suma_total = std::accumulate(valores.begin(), valores.end(), 0.0);
+            double probabilidad_acumulada = 0.0;
+            double ruleta_giro = generateRandomDouble() * suma_total;
+
+            for (size_t i = 0; i < valores.size(); ++i) {
+                probabilidad_acumulada += valores[i];
+                if (ruleta_giro <= probabilidad_acumulada) {
+                    action = i;
+                    break;
+                }
+            }
+
+        }else{
+            
+            logStream << "Seleccion Greedy determinista:" << std::endl;
+            // Greedy selection
+            std::vector<int> max_indices;
+            double max_value = *std::max_element(matrizQ[state].begin(), matrizQ[state].end());
+
+            //Travel matrizQ[state]
+            logStream << "Vector Q:" << std::endl;
+            for (size_t i = 0; i < matrizQ[state].size(); ++i) {
+                logStream << matrizQ[state][i] << " ";
+            }
+
+            for (size_t i = 0; i < matrizQ[state].size(); ++i) {
+                if (matrizQ[state][i] == max_value) {
+                    max_indices.push_back(i);
+                }
+            }
+
+            int randomAction = generateRandomInt(max_indices.size());
+
+            action = max_indices[randomAction];
         }
-
-        int randomAction = generateRandomInt(max_indices.size());
-
-        action = max_indices[randomAction];
-        
         logStream << "Accion escogida: "<<action<<std::endl<<std::endl;
+        
     } else {
         // Random selection
         logStream << "Seleccion Aleatoria:" << std::endl;

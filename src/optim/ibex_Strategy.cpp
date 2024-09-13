@@ -15,6 +15,7 @@ Strategy::Strategy(CellBeamSearch * buffer, int num_actions, double size_step) :
     accion_actual=0;
     srand(static_cast<unsigned>(time(0)));
     training = false;
+    ruleta = true;
 }
 
 Strategy::~Strategy(){}
