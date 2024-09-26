@@ -13,7 +13,9 @@
 namespace ibex {
 
 Bandit::Bandit(CellBeamSearch * buffer, int num_actions, double size_step) : Strategy(buffer,num_actions,size_step),
-                                                                           matrizQ(2, std::vector<double>(num_actions, 0.0))
+                                                                           matrizQ(2, std::vector<double>(num_actions, 0.0)),
+                                                                           matrizAlpha(2, std::vector<double>(num_actions, size_step)),
+                                                                           matrizCounter(2, std::vector<int>(num_actions, 1))
 {}
 
 Bandit::~Bandit(){}
@@ -78,6 +80,7 @@ int Bandit::selectAction(int state){
     }
 
     logStream << "Ingreso a Seleccion de accion:" << std::endl;
+    logStream << "EPSILON:" << epsilon << std::endl;
 
     if (randomNum > epsilon) {
         
@@ -182,12 +185,62 @@ int Bandit::selectAction(int state){
 void Bandit::updateQ(int actual_state, int actual_action, double reward){
 
     // Travel matrizQ[state]
-    logStream << "Q Antes:" << std::endl;
+    logStream << std::endl << "Q Antes:" << std::endl;
     for (size_t i = 0; i < matrizQ[actual_state].size(); ++i) {
         logStream << matrizQ[actual_state][i] << " ";
     }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    if(loup_found > 1){
+        //Significa que se encontro un loup, por lo tanto se usara un valor de alpha superior al original y luego se actualizara el valor de alpha, ademas de actualizar el contador.
+        double alphaTemporal = 0.5;
 
-    matrizQ[actual_state][actual_action] = matrizQ[actual_state][actual_action] + alpha*(reward - matrizQ[actual_state][actual_action]);  
+        //Sera mas agresivo en acercarse a la recompensa obtenido (recompensa positiva), debido a que el alpha Temporal es mayor al alpha original.
+        matrizQ[actual_state][actual_action] = matrizQ[actual_state][actual_action] + alphaTemporal*(reward - matrizQ[actual_state][actual_action]);
+
+        logStream<< std::endl << "Counter Antes:" << std::endl;
+        for (size_t i = 0; i < matrizCounter[actual_state].size(); ++i) {
+            logStream << matrizCounter[actual_state][i] << " ";
+        }
+
+        //El contador aumenta en 1 para esa posicion en la matriz. Esto hace que mientras mas veces encuentre buenas recompensas, mas lento cambiara el valor alto de Q, ya que el alpha sera menor.
+        matrizCounter[actual_state][actual_action] = matrizCounter[actual_state][actual_action] + 1;
+
+        logStream<< std::endl << "Counter Despues:" << std::endl;
+        for (size_t i = 0; i < matrizCounter[actual_state].size(); ++i) {
+            logStream << matrizCounter[actual_state][i] << " ";
+        }
+
+        logStream<< std::endl << "Alpha Antes:" << std::endl;
+        for (size_t i = 0; i < matrizAlpha[actual_state].size(); ++i) {
+            logStream << matrizAlpha[actual_state][i] << " ";
+        }
+        
+        //Actualiza el valor de alpha para esa posicion en la matriz. Va disminuyendo el valor de alpha en el tiempo. Este valor de alpha solo se usa cuando no encuentra soluciones, en caso contrario utiliza el valor de alpha temporal.
+        matrizAlpha[actual_state][actual_action] = alpha / matrizCounter[actual_state][actual_action];
+
+        logStream<< std::endl << "Alpha Despues:" << std::endl;
+        for (size_t i = 0; i < matrizAlpha[actual_state].size(); ++i) {
+            logStream << matrizAlpha[actual_state][i] << " ";
+        }
+
+    }else{
+
+        logStream<< std::endl << "Counter:" << std::endl;
+        for (size_t i = 0; i < matrizCounter[actual_state].size(); ++i) {
+            logStream << matrizCounter[actual_state][i] << " ";
+        }
+
+        logStream<< std::endl << "Alpha:" << std::endl;
+        for (size_t i = 0; i < matrizAlpha[actual_state].size(); ++i) {
+            logStream << matrizAlpha[actual_state][i] << " ";
+        }
+
+        matrizQ[actual_state][actual_action] = matrizQ[actual_state][actual_action] + matrizAlpha[actual_state][actual_action]*(reward - matrizQ[actual_state][actual_action]);  
+    
+    }  
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    
     logStream << std::endl<<"Q Despues:" << std::endl;
     for (size_t i = 0; i < matrizQ[actual_state].size(); ++i) {
@@ -238,10 +291,18 @@ void Bandit::MonitoringSize(){
         
         if(training){
             resetVars();
+            //Epsilon decrese su valor en el tiempo, de manera que al principio explore mucho y luego explote mucho.
+            decEpsilon();
         }
         
         change = true;
     }
+}
+
+void Bandit::decEpsilon(){
+    //Reduciendo el epsilon en el tiempo con un exponencial decreciente.
+    epsilon = epsilon * std::exp(-0.005 * actual_iteration);
+    actual_iteration++;
 }
 
 void Bandit::MonitoringChange(){

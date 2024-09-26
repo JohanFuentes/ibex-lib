@@ -435,12 +435,12 @@ Optimizer::Status Optimizer::optimize() {
 		CellBeamSearch * thebuffer = dynamic_cast<CellBeamSearch*>(&buffer);
 
 		bool useSarsa = false;
-		bool training = true;
+		bool training = false;
 
         if (useSarsa) {
-            strategy = new Sarsa(thebuffer, 8, 0.1);
+            strategy = new Sarsa(thebuffer, 8, 0.2);
         } else {
-            strategy = new Bandit(thebuffer, 8, 0.1);
+            strategy = new Bandit(thebuffer, 8, 0.2);
         }
 
 		if (training){
@@ -527,8 +527,6 @@ Optimizer::Status Optimizer::optimize() {
 		
 		strategy->saveVectorsToFile();
 		//strategy->saveLogs(); //No es necesario si no queremos ver como funciona ...	
-		
-		//delete strategy;
 
 		timer.stop();
 	 	time = timer.get_time();

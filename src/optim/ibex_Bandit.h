@@ -20,6 +20,8 @@ class Bandit : public Strategy {
 private:
 
     std::vector<std::vector<double>> matrizQ; // Matrix Q to store the values of each state-action pair
+    std::vector<std::vector<double>> matrizAlpha; // Matrix Q to store the alpha's values of each state-action pair
+    std::vector<std::vector<int>> matrizCounter; // Matrix Q to store the counter's values of each state-action pair
 
 public:
 
@@ -80,6 +82,8 @@ public:
     void setLoupChanged(bool loupChange);
 
     void updateWidth(double loup, double uplo);
+
+    void decEpsilon();
 
 };
 
