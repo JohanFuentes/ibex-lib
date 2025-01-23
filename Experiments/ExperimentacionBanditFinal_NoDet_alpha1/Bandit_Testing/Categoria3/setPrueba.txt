@@ -1,0 +1,6 @@
+Benchs/rosenbrock10.bch
+Benchs/hs108.bch
+Benchs/bearing.bch
+Benchs/ex8_1_3.bch
+Benchs/ex7_2_3.bch
+Benchs/sambal.bch

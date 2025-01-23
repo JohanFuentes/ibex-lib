@@ -16,6 +16,7 @@
 #include "ibex_CellBeamSearch.h"
 #include "ibex_Bandit.h"
 #include "ibex_Sarsa.h"
+#include "ibex_RoundRobin.h"
 #include "ibex_Strategy.h"
 #include <typeinfo>
 #include <float.h>
@@ -424,8 +425,6 @@ Optimizer::Status Optimizer::optimize() {
 	Timer timer;
 	timer.start();
 
-	ofstream myfile("ContenidoEjecucion.txt");
-
 	update_uplo();
 
 	Strategy* strategy = nullptr;
@@ -434,14 +433,18 @@ Optimizer::Status Optimizer::optimize() {
 		//Cast to CellBeamSearch for use of setCost2Function
 		CellBeamSearch * thebuffer = dynamic_cast<CellBeamSearch*>(&buffer);
 
-		bool useSarsa = false;
+		bool useSarsa = true;
+		bool useBandit = false;
+		bool useRoundRobin = false;
 		bool training = true;
 
         if (useSarsa) {
-            strategy = new Sarsa(thebuffer, 8, 0.1);
-        } else {
-            strategy = new Bandit(thebuffer, 8, 0.1);
-        }
+            strategy = new Sarsa(thebuffer, 8, 1);
+        } else if(useBandit){
+            strategy = new Bandit(thebuffer, 8, 1);
+        }else if(useRoundRobin){
+			strategy = new RoundRobin(thebuffer, 8, 1);
+		}
 
 		if (training){
 			strategy->modeTraining();
@@ -499,6 +502,10 @@ Optimizer::Status Optimizer::optimize() {
 					}
 				}
 				update_uplo();
+				
+				//cout<<"TRY SIZE BUFFER: "<<thebuffer->size()<<endl;
+				//cout<<"STATE: "<<strategy->getActualState()<<endl;
+
 
 				strategy->updateWidth(loup,uplo);
 				strategy->MonitoringChange();
@@ -520,13 +527,14 @@ Optimizer::Status Optimizer::optimize() {
 				delete c; // deletes the cell.
 				update_uplo(); // the heap has changed -> recalculate the uplo (eg: if not in best-first search)
 
+				cout<<"CATCH SIZE BUFFER: "<<thebuffer->size()<<endl;
 				strategy->updateWidth(loup,uplo);
 				strategy->MonitoringSize();
 			}
 		}
 		
 		strategy->saveVectorsToFile();
-		//strategy->saveLogs(); //No es necesario si no queremos ver como funciona ...	
+		strategy->saveLogs(); //No es necesario si no queremos ver como funciona ...	
 		
 		//delete strategy;
 
@@ -549,7 +557,7 @@ Optimizer::Status Optimizer::optimize() {
 	catch (TimeOutException& ) {
 		status = TIME_OUT;
 	}
-	myfile.close();
+
 	/* TODO: cannot retrieve variable names here. */
 	for (int i=0; i<(extended_COV ? n+1 : n); i++)
 		cov->data->_optim_var_names.push_back(string(""));

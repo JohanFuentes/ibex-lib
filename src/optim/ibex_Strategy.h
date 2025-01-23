@@ -34,6 +34,7 @@ protected:
     bool start;                     // To know if the search has started
     bool training;                  // To know if the strategy is in training mode
     bool ruleta;                    // To know if the selection is based on roulette
+    bool finish;                    // To know if the search has finished
 
 public:
 
@@ -64,6 +65,7 @@ public:
     // Select the action to take in the current state
 
     virtual int selectAction(int state) = 0;
+    virtual int selectAction() = 0;
 
     // Monitoring the size of the future buffer (if empty or not), for knowing if the type search has changed (exploration or explotation)
 

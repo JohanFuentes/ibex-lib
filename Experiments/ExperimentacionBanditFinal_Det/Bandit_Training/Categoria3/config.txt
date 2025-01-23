@@ -1,0 +1,15 @@
+[base]
+test_instances = setEntrenamiento.txt
+mintime = 2.0 20.0 100.0 1000.0
+maxtime = 3600
+factors = 1 0.833 0.665 0.5 0.2 0.1
+sig_gain = 1.05
+max_seeds = 50
+min_seeds = 50
+algo_names = bandit_training_c3
+
+[bandit_training_c3]
+exec = "../ibexopt"
+params = _INSTANCE --timeout=_MAXTIME --random-seed=_SEED
+outputpos_times = 1
+outputpos_boxes = 0

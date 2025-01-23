@@ -1,0 +1,7 @@
+Benchs/ex8_4_5-1.bch
+Benchs/ex14_1_7.bch
+Benchs/ex8_4_4bis.bch
+Benchs/ex6_1_3.bch
+Benchs/hhfair1.bch
+Benchs/ex5_4_4.bch
+Benchs/dualc8.bch

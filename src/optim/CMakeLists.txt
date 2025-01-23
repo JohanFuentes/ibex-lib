@@ -24,6 +24,8 @@ target_sources (ibex PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/ibex_Sarsa.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ibex_Strategy.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ibex_Strategy.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ibex_RoundRobin.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ibex_RoundRobin.h
 )
 
 target_include_directories (ibex PUBLIC

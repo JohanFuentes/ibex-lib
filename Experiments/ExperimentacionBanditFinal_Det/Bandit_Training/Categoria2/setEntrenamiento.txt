@@ -1,0 +1,11 @@
+Benchs/ex8_4_4bis.bch
+Benchs/ex7_3_4.bch
+Benchs/alkylbis.bch
+Benchs/ex7_3_4bis.bch
+Benchs/ex6_2_10.bch
+Benchs/ex8_4_4-1.bch
+Benchs/ex2_1_9bis.bch
+Benchs/dixchlng.bch
+Benchs/immun.bch
+Benchs/avion2.bch
+Benchs/hs093.bch

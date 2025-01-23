@@ -4,7 +4,7 @@
 namespace ibex {
 
 Strategy::Strategy(CellBeamSearch * buffer, int num_actions, double size_step) : buffer(buffer), k(num_actions), alpha(size_step) {
-    epsilon = 0.1;
+    epsilon = 0.99;
     change = false;
     start = false;
     nb_cells = 0;
@@ -16,6 +16,7 @@ Strategy::Strategy(CellBeamSearch * buffer, int num_actions, double size_step) :
     srand(static_cast<unsigned>(time(0)));
     training = false;
     ruleta = true;
+    finish = false;
 }
 
 Strategy::~Strategy(){}

@@ -13,7 +13,7 @@
 namespace ibex {
 
 Sarsa::Sarsa(CellBeamSearch * buffer, int num_actions, double size_step) : Strategy(buffer,num_actions,size_step),
-                                                                           matrizQ(60, std::vector<double>(num_actions, 0.0)),
+                                                                           matrizQ(2, std::vector<double>(num_actions, 0.0)),
                                                                            loup_changed(false),
                                                                            width(0.0)
 {}
@@ -39,40 +39,54 @@ void Sarsa::resetVars(){
 }
 
 double Sarsa::calculateRewardExploration(){
-    logStream << "Calculo recompensa exploracion:" << std::endl;
-    logStream << "Numero de celdas: " <<nb_cells<<std::endl;
-    logStream << "loups encontrados: " <<loup_found<<std::endl;
+    //logStream << "Calculo recompensa exploracion:" << std::endl;
+    //logStream << "Numero de celdas: " <<nb_cells<<std::endl;
+    //logStream << "loups encontrados: " <<loup_found<<std::endl;
     double reward = 0.0;
 
+    reward = loup_found;
+/*
     if(loup_found == 1){
         reward = -2.0;
+        //reward = 0;
     }else{
         reward = 10000.0*loup_found;
+        //reward = 1000.0*loup_found;
     }
-
-    logStream << "Recompensa: "<< reward << std::endl<<std::endl;
+*/
+    // logStream << "Recompensa: "<< reward << std::endl<<std::endl;
 
     return reward;
 }
 
 double Sarsa::calculateRewardExplotation(){
 
-    logStream << "Calculo recompensa explotacion:" << std::endl;
-    logStream << "Numero de celdas: " <<nb_cells<<std::endl;
-    logStream << "loups encontrados: " <<loup_found<<std::endl;
+    // logStream << "Calculo recompensa explotacion:" << std::endl;
+    // logStream << "Numero de celdas: " <<nb_cells<<std::endl;
+    // logStream << "loups encontrados: " <<loup_found<<std::endl;
 
     double reward = 0.0;
 
-    if(loup_found == 1){
-        reward = -nb_cells*1.0;
+    if(loup_found > 1){
+        reward = loup_found/nb_cells;
     }else{
-        reward = 100000.0*loup_found/nb_cells;    
+        reward = -nb_cells;
     }
 
-    logStream << "Recompensa: "<< reward << std::endl<<std::endl;
+    // if(loup_found == 1){
+    //     //reward = 0;
+    //     reward = -nb_cells*1.0;
+    // }else{
+    //     reward = 100000.0*loup_found/nb_cells;
+    //     //reward = 10000.0*loup_found/nb_cells;    
+    // }
+
+    // logStream << "Recompensa: "<< reward << std::endl<<std::endl;
 
     return reward;
 }
+
+int Sarsa::selectAction(){return 0;}
 
 int Sarsa::selectAction(int state){
 
@@ -86,14 +100,14 @@ int Sarsa::selectAction(int state){
         randomNum = 1.0;
     }
 
-    logStream << "Ingreso a Seleccion de accion:" << std::endl;
+    // logStream << "Ingreso a Seleccion de accion:" << std::endl;
 
-    if (randomNum > epsilon) {
+    if (randomNum >= epsilon) {
         
-        logStream << "Seleccion Greedy:" << std::endl;
+        // logStream << "Seleccion Greedy:" << std::endl;
 
-        if(ruleta){
-            logStream << "Usando ruleta:" << std::endl;
+        if(ruleta and state == 1){
+            // logStream << "Usando ruleta:" << std::endl;
 
             // Selección basada en ruleta
             std::vector<double> valores = matrizQ[state];
@@ -122,15 +136,15 @@ int Sarsa::selectAction(int state){
 
         }else{
             
-            logStream << "Seleccion Greedy determinista:" << std::endl;
+            // logStream << "Seleccion Greedy determinista:" << std::endl;
             // Greedy selection
             std::vector<int> max_indices;
             double max_value = *std::max_element(matrizQ[state].begin(), matrizQ[state].end());
 
             //Travel matrizQ[state]
-            logStream << "Vector Q:" << std::endl;
+            // logStream << "Vector Q:" << std::endl;
             for (size_t i = 0; i < matrizQ[state].size(); ++i) {
-                logStream << matrizQ[state][i] << " ";
+                // logStream << matrizQ[state][i] << " ";
             }
 
             for (size_t i = 0; i < matrizQ[state].size(); ++i) {
@@ -143,15 +157,15 @@ int Sarsa::selectAction(int state){
 
             action = max_indices[randomAction];
         }
-        logStream << "Accion escogida: "<<action<<std::endl<<std::endl;
+        // logStream << "Accion escogida: "<<action<<std::endl<<std::endl;
         
     } else {
         // Random selection
-        logStream << "Seleccion Aleatoria:" << std::endl;
+        // logStream << "Seleccion Aleatoria:" << std::endl;
         int randomAction = generateRandomInt(matrizQ[state].size());
 
         action = randomAction;
-        logStream << "Accion escogida: "<<action<<std::endl<<std::endl;
+        // logStream << "Accion escogida: "<<action<<std::endl<<std::endl;
     }
 
     return action;
@@ -160,17 +174,28 @@ int Sarsa::selectAction(int state){
 void Sarsa::updateQ(int actual_state, int future_state, int actual_action, int future_action, double reward){
 
     //Travel matrizQ[state]
-    logStream << "Q Antes:" << std::endl;
-    for (size_t i = 0; i < matrizQ[actual_state].size(); ++i) {
-        logStream << matrizQ[actual_state][i] << " ";
+    // logStream << "Q Antes:" << std::endl;
+    // for (size_t i = 0; i < matrizQ[actual_state].size(); ++i) {
+    //     // logStream << matrizQ[actual_state][i] << " ";
+    // }
+    if(buffer->size() == 0 && future_state == 1){
+        // Estado terminal
+        matrizQ[actual_state][actual_action] = matrizQ[actual_state][actual_action] + alpha*(reward + 0 - matrizQ[actual_state][actual_action]);
+        //std::cout << "ENTRO AQUI ESTADO TERMINAL" << std::endl;
+    }else{
+        // Estado no terminal
+        matrizQ[actual_state][actual_action] = matrizQ[actual_state][actual_action] + alpha*(reward + matrizQ[future_state][future_action] - matrizQ[actual_state][actual_action]);
+        //std::cout << "ENTRO AQUI ESTADO NO TERMINAL" << std::endl;
     }
 
-    matrizQ[actual_state][actual_action] = matrizQ[actual_state][actual_action] + alpha*(reward + 0.9*matrizQ[future_state][future_action] - matrizQ[actual_state][actual_action]);  
+    
+    // std::cout << "SIZE BUFFER: " <<buffer->size()<<std::endl;
+    // std::cout << "Update Q: " <<actual_state<<" , "<<future_state<<std::endl;  
     //matrizQ[actual_state][actual_action] = matrizQ[actual_state][actual_action] + alpha*(reward - matrizQ[actual_state][actual_action]);   
-    logStream << "Q Despues:" << std::endl;
-    for (size_t i = 0; i < matrizQ[actual_state].size(); ++i) {
-        logStream << matrizQ[actual_state][i] << " ";
-    }
+    // logStream << "Q Despues:" << std::endl;
+    // for (size_t i = 0; i < matrizQ[actual_state].size(); ++i) {
+    //     // logStream << matrizQ[actual_state][i] << " ";
+    // }
 }
 
 void Sarsa::updateQ(int actual_state, int actual_action, double reward){}
@@ -178,40 +203,40 @@ void Sarsa::updateQ(int actual_state, int actual_action, double reward){}
 void Sarsa::MonitoringSize(){
     if(buffer->futurebuffer.size() == 0){
 
-        logStream << "Monitoring Size (Exploracion):" << std::endl;
+        // logStream << "Monitoring Size (Exploracion):" << std::endl;
 
-        logStream << "Estado anterior: " <<estado_anterior<<std::endl;
-        logStream << "Accion anterior: " <<accion_anterior<<std::endl;
-        logStream << "Estado actual: " <<estado_actual<<std::endl;
-        logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
+        // logStream << "Estado anterior: " <<estado_anterior<<std::endl;
+        // logStream << "Accion anterior: " <<accion_anterior<<std::endl;
+        // logStream << "Estado actual: " <<estado_actual<<std::endl;
+        // logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
 
         double reward = 0;
 
         if(training){
             reward = calculateRewardExploration();
-            logStream << "Update Q: " <<estado_anterior<<" , "<<accion_anterior<<std::endl;
+            // logStream << "Update Q: " <<estado_anterior<<" , "<<accion_anterior<<std::endl;
             updateQ(estado_anterior, estado_actual, accion_anterior, accion_actual, reward);
+    
         }
-
-
 
         estado_anterior = estado_actual;
         accion_anterior = accion_actual;
         
-        estado_actual = ActualState(true, width, buffer->CellDoubleHeap::size() , loup_changed);
+        //estado_actual = ActualState(true, width, buffer->CellDoubleHeap::size() , loup_changed);
+        estado_actual = ActualState(true);
         accion_actual = selectAction(estado_actual);
         
 
         if(training){
             reward = calculateRewardExplotation();
-            logStream << "Update Q: " <<estado_anterior<<" , "<<accion_anterior<<std::endl;
+            // logStream << "Update Q: " <<estado_anterior<<" , "<<accion_anterior<<std::endl;
             updateQ(estado_anterior, estado_actual, accion_anterior, accion_actual, reward);
         }
 
-        logStream << "Estado anterior: " <<estado_anterior<<std::endl;
-        logStream << "Accion anterior: " <<accion_anterior<<std::endl;
-        logStream << "Estado actual: " <<estado_actual<<std::endl;
-        logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
+        // logStream << "Estado anterior: " <<estado_anterior<<std::endl;
+        // logStream << "Accion anterior: " <<accion_anterior<<std::endl;
+        // logStream << "Estado actual: " <<estado_actual<<std::endl;
+        // logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
 
 
         buffer->setCost2Function(accion_actual);
@@ -228,23 +253,24 @@ void Sarsa::MonitoringSize(){
 void Sarsa::MonitoringChange(){
 
     if(change){
-        logStream << "Monitoring Change (Explotacion):" << std::endl;
+        // logStream << "Monitoring Change (Explotacion):" << std::endl;
         
-        logStream << "Estado anterior: " <<estado_anterior<<std::endl;
-        logStream << "Accion anterior: " <<accion_anterior<<std::endl;
-        logStream << "Estado actual: " <<estado_actual<<std::endl;
-        logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
+        // logStream << "Estado anterior: " <<estado_anterior<<std::endl;
+        // logStream << "Accion anterior: " <<accion_anterior<<std::endl;
+        // logStream << "Estado actual: " <<estado_actual<<std::endl;
+        // logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
 
         estado_anterior = estado_actual;
         accion_anterior = accion_actual;
         
-        estado_actual = ActualState(false, width, -1, loup_changed);
+        //estado_actual = ActualState(false, width, -1, loup_changed);
+        estado_actual = ActualState(false);
         accion_actual = selectAction(estado_actual);
 
-        logStream << "Estado anterior: " <<estado_anterior<<std::endl;
-        logStream << "Accion anterior: " <<accion_anterior<<std::endl;
-        logStream << "Estado actual: " <<estado_actual<<std::endl;
-        logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
+        // logStream << "Estado anterior: " <<estado_anterior<<std::endl;
+        // logStream << "Accion anterior: " <<accion_anterior<<std::endl;
+        // logStream << "Estado actual: " <<estado_actual<<std::endl;
+        // logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
 
         buffer->setCost2Function(accion_actual);
         change = false;
@@ -289,10 +315,12 @@ void Sarsa::saveVectorsToFile(){
             for (const auto& fila : matrizQ) {
                 for (int elemento : fila) {
                     file << elemento << " ";
+                    logStream << elemento << " ";
                 }
                 file << "\n";
+                logStream << "\n";
             }
-
+            logStream << "\n";
             file.close();
 
         }
@@ -370,24 +398,39 @@ int Sarsa::ActualState(bool searchType, double width, int activeNodes, bool loup
 
 }
 
-int Sarsa::ActualState(bool searchType){return 0;}
+int Sarsa::ActualState(bool searchType){
+    
+    int state = -1;
+
+    if (!searchType) {
+        // When searchType it's False (Explotación)
+        state = 0;
+    } else {
+        // When searchType it's True (Exploración)
+        state = 1;
+    }
+
+    return state;
+
+}
 
 void Sarsa::StartExploration() {
     loadVectorsFromFile();
-    logStream << "Start Exploration:" << std::endl;
-    logStream << "Estado anterior: " <<estado_anterior<<std::endl;
-    logStream << "Accion anterior: " <<accion_anterior<<std::endl;
-    logStream << "Estado actual: " <<estado_actual<<std::endl;
-    logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
+    // logStream << "Start Exploration:" << std::endl;
+    // logStream << "Estado anterior: " <<estado_anterior<<std::endl;
+    // logStream << "Accion anterior: " <<accion_anterior<<std::endl;
+    // logStream << "Estado actual: " <<estado_actual<<std::endl;
+    // logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
 
-    estado_actual = ActualState(true, width, 1, loup_changed);
+    //estado_actual = ActualState(true, width, 1, loup_changed);
+    estado_actual = ActualState(true); // Exploration(1)
     accion_actual = selectAction(estado_actual);
     
-    logStream << "Se cambio estado actual y accion actual:" << std::endl;
-    logStream << "Estado anterior: " <<estado_anterior<<std::endl;
-    logStream << "Accion anterior: " <<accion_anterior<<std::endl;
-    logStream << "Estado actual: " <<estado_actual<<std::endl;
-    logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
+    // logStream << "Se cambio estado actual y accion actual:" << std::endl;
+    // logStream << "Estado anterior: " <<estado_anterior<<std::endl;
+    // logStream << "Accion anterior: " <<accion_anterior<<std::endl;
+    // logStream << "Estado actual: " <<estado_actual<<std::endl;
+    // logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
 
     buffer->setCost2Function(accion_actual);
     start = true;
@@ -396,15 +439,16 @@ void Sarsa::StartExploration() {
 void Sarsa::StartExplotation() {
     if(start){
         estado_anterior = estado_actual;
-        estado_actual = ActualState(false, width, -1, loup_changed);
+        //estado_actual = ActualState(false, width, -1, loup_changed);
+        estado_actual = ActualState(false);
         accion_anterior = accion_actual;
         accion_actual = selectAction(estado_actual);
 
-        logStream << "Se cambio estado actual, accion actual, estado anterior y accion anterior:" << std::endl;
-        logStream << "Estado anterior: " <<estado_anterior<<std::endl;
-        logStream << "Accion anterior: " <<accion_anterior<<std::endl;
-        logStream << "Estado actual: " <<estado_actual<<std::endl;
-        logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
+        // logStream << "Se cambio estado actual, accion actual, estado anterior y accion anterior:" << std::endl;
+        // logStream << "Estado anterior: " <<estado_anterior<<std::endl;
+        // logStream << "Accion anterior: " <<accion_anterior<<std::endl;
+        // logStream << "Estado actual: " <<estado_actual<<std::endl;
+        // logStream << "Accion actual: " <<accion_actual<<std::endl<<std::endl;
 
         buffer->setCost2Function(accion_actual);
         start = false;

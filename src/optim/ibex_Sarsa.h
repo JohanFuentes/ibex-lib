@@ -38,6 +38,7 @@ public:
     double calculateRewardExplotation();
 
     int selectAction(int state);
+    int selectAction();
 
     void MonitoringSize();
 
